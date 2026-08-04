@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>qllqovo · 个人网站</title>
+  <!-- Tailwind CSS CDN (JIT 模式) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 自定义样式覆盖与扩展 -->
+  <style>
+    /* === 全局重置：强制无圆角 === */
+    * { border-radius: 0 !important; }
+
+    /* 基础色调：暖米色背景、柔和黑文字 */
+    body {
+      background-color: #F9F8F6;
+      color: #1C1C1C;
+      font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    }
+
+    /* 标题使用衬线字体（用系统衬线替代） */
+    .font-serif {
+      font-family: 'Georgia', 'Times New Roman', serif;
+    }
+
+    /* 禁止所有阴影（除了自定义偏移阴影） */
+    .shadow,
+    .shadow-sm,
+    .shadow-md,
+    .shadow-lg,
+    .shadow-xl,
+    .shadow-2xl {
+      box-shadow: none !important;
+    }
+
+    /* 自定义偏移阴影（符合规范） */
+    .shadow-custom {
+      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+    }
+    .shadow-custom-hover {
+      box-shadow: 4px 4px 0px 0px rgba(255, 0, 110, 1);
+    }
+    @media (min-width: 768px) {
+      .shadow-custom {
+        box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+      }
+      .shadow-custom-hover {
+        box-shadow: 8px 8px 0px 0px rgba(255, 0, 110, 1);
+      }
+    }
+
+    /* 卡片、按钮的过渡 */
+    .card-hover {
+      transition: all 0.2s ease;
+    }
+    .card-hover:hover {
+      box-shadow: 4px 4px 0px 0px rgba(255, 0, 110, 1);
+      transform: translateY(-2px);
+    }
+    @media (min-width: 768px) {
+      .card-hover:hover {
+        box-shadow: 8px 8px 0px 0px rgba(255, 0, 110, 1);
+        transform: translateY(-4px);
+      }
+    }
+
+    /* 按钮悬停位移效果 */
+    .btn-hover {
+      transition: all 0.15s ease;
+    }
+    .btn-hover:hover {
+      box-shadow: none !important;
+      transform: translate(2px, 2px);
+    }
+    @media (min-width: 768px) {
+      .btn-hover:hover {
+        transform: translate(4px, 4px);
+      }
+    }
+
+    /* 导航链接下划线动画 */
+    .nav-link {
+      position: relative;
+      text-decoration: none;
+      color: #1C1C1C;
+      transition: color 0.2s;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: #1C1C1C;
+      transition: width 0.25s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .nav-link.active {
+      font-weight: 600;
+    }
+    .nav-link.active::after {
+      width: 100%;
+    }
+
+    /* 模块内容容器切换 */
+    .module-content {
+      display: none;
+    }
+    .module-content.active {
+      display: block;
+    }
+
+    /* 留言卡片 */
+    .message-card {
+      border: 1px solid #1C1C1C;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .message-card:hover {
+      border-color: #1C1C1C;
+    }
+    .message-card.own {
+      background: #e8e6e1;
+      border-left: 4px solid #1C1C1C;
+    }
+
+    /* 输入框样式 */
+    input, textarea, select {
+      border: 1px solid #1C1C1C;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      background: #ffffff;
+      transition: border-color 0.2s;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: #1C1C1C;
+      outline: 2px solid #1C1C1C;
+      outline-offset: 0px;
+    }
+    ::placeholder {
+      color: #1C1C1C / 0.4;
+    }
+
+    /* 模态框 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-box {
+      background: #F9F8F6;
+      border: 2px solid #1C1C1C;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+    }
+    @media (min-width: 768px) {
+      .modal-box {
+        padding: 2.5rem;
+        box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+      }
+    }
+
+    /* 隐藏的管理面板 */
+    .admin-panel {
+      display: none;
+      margin-top: 2rem;
+      border-top: 2px solid #1C1C1C;
+      padding-top: 1.5rem;
+    }
+    .admin-panel.open {
+      display: block;
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 640px) {
+      .modal-box { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ======================== 首页（欢迎） ======================== -->
+<div id="welcome" class="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-[#F9F8F6]">
+  <div class="max-w-2xl">
+    <p class="text-2xl md:text-4xl font-serif tracking-tight mb-6">👋 This is qllqovo, welcome to my website!</p>
+    <!-- 门铃按钮 -->
+    <button id="doorbellBtn" class="px-8 py-4 text-sm md:text-base tracking-wide border-2 md:border-4 border-black bg-white shadow-custom btn-hover font-serif">
+      🔔 按响门铃
+    </button>
+  </div>
+</div>
+
+<!-- ======================== 主界面 ======================== -->
+<div id="main" class="hidden min-h-screen bg-[#F9F8F6] text-[#1C1C1C]">
+  
+  <!-- 导航栏 -->
+  <nav class="bg-white border-b-2 md:border-b-4 border-black px-4 md:px-8 py-3 md:py-4 sticky top-0 z-50">
+    <div class="flex flex-wrap items-center justify-between max-w-6xl mx-auto">
+      <a href="#" class="font-serif text-xl md:text-2xl tracking-tight">qllqovo</a>
+      <div class="flex flex-wrap gap-3 md:gap-6 text-xs md:text-sm font-sans uppercase tracking-wider">
+        <a href="#" class="nav-link active" data-module="about">About</a>
+        <a href="#" class="nav-link" data-module="projects">Projects</a>
+        <a href="#" class="nav-link" data-module="blog">Blog</a>
+        <a href="#" class="nav-link" data-module="contact">Contact</a>
+        <a href="#" class="nav-link" data-module="resume">Resume</a>
+        <a href="#" class="nav-link" data-module="guestbook">Guestbook</a>
+        <a href="#" class="nav-link" data-module="skills">Skills</a>
+        <a href="#" class="nav-link" data-module="music">Music</a>
+        <a href="#" class="nav-link" data-module="footprint">Footprint</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 内容区域 -->
+  <div class="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-20">
+    <!-- About Me -->
+    <div id="module-about" class="module-content active">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">About Me</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed max-w-2xl">这里是关于我的基本信息。目前正在建设中，敬请期待。</p>
+      <div class="mt-8 border border-black p-6 bg-white/50">
+        <p class="font-sans text-sm">👤 姓名：qllqovo</p>
+        <p class="font-sans text-sm mt-2">📧 邮箱：qllqovo@example.com</p>
+        <p class="font-sans text-sm mt-2">🌍 城市：未知</p>
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div id="module-projects" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Projects</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">我的项目展示，开发中……</p>
+    </div>
+
+    <!-- Blog -->
+    <div id="module-blog" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Blog</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">博客文章，开发中……</p>
+    </div>
+
+    <!-- Contact -->
+    <div id="module-contact" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Contact</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">联系方式，开发中……</p>
+    </div>
+
+    <!-- Resume -->
+    <div id="module-resume" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Resume</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">简历，开发中……</p>
+    </div>
+
+    <!-- Guestbook (完整交互) -->
+    <div id="module-guestbook" class="module-content">
+      <div class="flex flex-wrap items-center justify-between mb-8">
+        <h2 class="font-serif text-3xl md:text-5xl tracking-tight">Guestbook</h2>
+        <button id="writeBtn" class="px-6 py-2 text-sm tracking-wide border-2 border-black bg-white shadow-custom btn-hover font-serif">
+          ✏️ Write one
+        </button>
+      </div>
+
+      <!-- 留言列表（公开） -->
+      <div id="messageList" class="space-y-3">
+        <!-- 由 JS 动态渲染 -->
+        <p class="font-sans text-sm text-[#1C1C1C]/60">暂无公开留言，快来写一条吧！</p>
+      </div>
+
+      <!-- 用户自己的留言（底部灰色模块） -->
+      <div id="ownMessages" class="mt-10 border-t-2 border-black pt-6">
+        <h3 class="font-serif text-xl md:text-2xl tracking-tight mb-4">📬 我的留言</h3>
+        <div id="ownList" class="space-y-3">
+          <!-- 动态渲染 -->
+          <p class="font-sans text-sm text-[#1C1C1C]/60">你还没有留言。</p>
+        </div>
+      </div>
+
+      <!-- 管理员入口（隐蔽：双击页脚或点击特定文字） -->
+      <div class="mt-16 text-center text-xs text-[#1C1C1C]/40">
+        <span id="adminToggle" class="cursor-pointer hover:text-[#1C1C1C]/80">⚙️ 管理</span>
+      </div>
+      <!-- 管理员面板 -->
+      <div id="adminPanel" class="admin-panel">
+        <h4 class="font-serif text-xl mb-4">📋 所有留言（仅管理员）</h4>
+        <div id="adminList" class="space-y-3">
+          <!-- 动态渲染 -->
+        </div>
+        <button id="adminClose" class="mt-4 px-4 py-2 border border-black text-sm btn-hover bg-white">关闭管理</button>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    <div id="module-skills" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Skills</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">技能标签，开发中……</p>
+    </div>
+
+    <!-- Music Playlist -->
+    <div id="module-music" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Music Playlist</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">歌单，开发中……</p>
+    </div>
+
+    <!-- Footprint -->
+    <div id="module-footprint" class="module-content">
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Footprint</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed">足迹地图，开发中……</p>
+    </div>
+  </div>
+
+  <!-- 页脚 -->
+  <footer class="bg-white border-t-2 md:border-t-4 border-black py-8 md:py-12 px-4 md:px-8 mt-12">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs md:text-sm">
+      <span class="font-serif tracking-tight">© qllqovo 2026</span>
+      <span class="font-sans text-[#1C1C1C]/60">Made with ✦ on GitHub Pages</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ======================== 模态框：输入名字 ======================== -->
+<div id="nameModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="font-serif text-2xl mb-4">🔔 Who's there?</h3>
+    <input id="nameInput" type="text" placeholder="输入你的名字..." class="mb-4" />
+    <div class="flex gap-3 justify-end">
+      <button id="nameCancel" class="px-4 py-2 border border-black text-sm btn-hover bg-white">取消</button>
+      <button id="nameConfirm" class="px-6 py-2 border-2 border-black bg-black text-white text-sm btn-hover shadow-custom">进入</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== 模态框：写留言 ======================== -->
+<div id="writeModal" class="modal-overlay">
+  <div class="modal-box">
+    <h3 class="font-serif text-2xl mb-4">✏️ Write one</h3>
+    <form id="messageForm">
+      <div class="mb-3">
+        <label class="block text-sm font-sans uppercase tracking-wider mb-1">类型</label>
+        <select id="msgType" class="w-full">
+          <option value="Words">Words</option>
+          <option value="Questions">Questions</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="block text-sm font-sans uppercase tracking-wider mb-1">内容</label>
+        <textarea id="msgContent" rows="4" placeholder="写点什么..." class="w-full"></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-sans uppercase tracking-wider mb-1">可见性</label>
+        <select id="msgVisibility" class="w-full">
+          <option value="Public">Public（公开，显示名字）</option>
+          <option value="Anonymous">Anonymous（匿名，不公开名字）</option>
+        </select>
+        <p class="text-xs text-[#1C1C1C]/60 mt-1">注：匿名留言默认不公开，需管理员审核。</p>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button type="button" id="writeCancel" class="px-4 py-2 border border-black text-sm btn-hover bg-white">取消</button>
+        <button type="submit" class="px-6 py-2 border-2 border-black bg-black text-white text-sm btn-hover shadow-custom">提交</button>
+      </div>
+    </form>
+    <div id="deliveredMsg" class="hidden mt-4 text-center font-serif text-xl">Delivered! ✉</div>
+  </div>
+</div>
+
+<!-- ======================== JavaScript ======================== -->
+<script>
+  (function() {
+    'use strict';
+
+    // ---------- 存储键名 ----------
+    const STORAGE_KEY = 'qllqovo_guestbook';
+    const USER_KEY = 'qllqovo_username';
+
+    // ---------- 当前用户名 ----------
+    let currentUser = localStorage.getItem(USER_KEY) || '';
+
+    // ---------- DOM 引用 ----------
+    const welcome = document.getElementById('welcome');
+    const main = document.getElementById('main');
+    const doorbellBtn = document.getElementById('doorbellBtn');
+    const nameModal = document.getElementById('nameModal');
+    const nameInput = document.getElementById('nameInput');
+    const nameCancel = document.getElementById('nameCancel');
+    const nameConfirm = document.getElementById('nameConfirm');
+
+    const writeBtn = document.getElementById('writeBtn');
+    const writeModal = document.getElementById('writeModal');
+    const writeCancel = document.getElementById('writeCancel');
+    const messageForm = document.getElementById('messageForm');
+    const msgType = document.getElementById('msgType');
+    const msgContent = document.getElementById('msgContent');
+    const msgVisibility = document.getElementById('msgVisibility');
+    const deliveredMsg = document.getElementById('deliveredMsg');
+
+    const messageList = document.getElementById('messageList');
+    const ownList = document.getElementById('ownList');
+    const adminPanel = document.getElementById('adminPanel');
+    const adminList = document.getElementById('adminList');
+    const adminToggle = document.getElementById('adminToggle');
+    const adminClose = document.getElementById('adminClose');
+
+    // 所有导航链接
+    const navLinks = document.querySelectorAll('.nav-link');
+    const moduleContents = document.querySelectorAll('.module-content');
+
+    // 管理员密码（简单）
+    const ADMIN_PASSWORD = 'qllqovo2026';
+
+    // ---------- 辅助函数 ----------
+    function getMessages() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch { return []; }
+    }
+
+    function saveMessages(messages) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    }
+
+    function generateId() {
+      return Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    }
+
+    // ---------- 渲染留言 ----------
+    function renderGuestbook() {
+      const messages = getMessages();
+      const username = currentUser;
+
+      // 1. 公开留言：userPublic === true && adminPublic === true
+      const publicMsgs = messages.filter(m => m.userPublic === true && m.adminPublic === true);
+      // 按时间降序
+      publicMsgs.sort((a, b) => b.timestamp - a.timestamp);
+
+      if (publicMsgs.length === 0) {
+        messageList.innerHTML = '<p class="font-sans text-sm text-[#1C1C1C]/60">暂无公开留言，快来写一条吧！</p>';
+      } else {
+        let html = '';
+        publicMsgs.forEach(m => {
+          const displayName = m.anonymous ? 'Anonymous' : m.username;
+          const typeLabel = m.type === 'Words' ? '💬' : '❓';
+          html += `
+            <div class="message-card">
+              <div class="flex justify-between items-start">
+                <span class="font-serif font-bold text-sm">${displayName}</span>
+                <span class="text-xs text-[#1C1C1C]/60">${typeLabel}</span>
+              </div>
+              <p class="font-sans text-sm mt-1 leading-relaxed">${escapeHtml(m.content)}</p>
+              <div class="text-xs text-[#1C1C1C]/40 mt-2">${new Date(m.timestamp).toLocaleString()}</div>
+            </div>
+          `;
+        });
+        messageList.innerHTML = html;
+      }
+
+      // 2. 自己的留言（无论公开与否，显示在底部灰色区域）
+      const ownMsgs = messages.filter(m => m.username === username);
+      ownMsgs.sort((a, b) => b.timestamp - a.timestamp);
+
+      if (ownMsgs.length === 0) {
+        ownList.innerHTML = '<p class="font-sans text-sm text-[#1C1C1C]/60">你还没有留言。</p>';
+      } else {
+        let html = '';
+        ownMsgs.forEach(m => {
+          const displayName = m.anonymous ? 'Anonymous' : m.username;
+          const status = (m.userPublic && m.adminPublic) ? '✅ 公开' : '🔒 未公开';
+          const typeLabel = m.type === 'Words' ? '💬' : '❓';
+          html += `
+            <div class="message-card own">
+              <div class="flex justify-between items-start">
+                <span class="font-serif font-bold text-sm">${displayName}</span>
+                <span class="text-xs text-[#1C1C1C]/60">${typeLabel} · ${status}</span>
+              </div>
+              <p class="font-sans text-sm mt-1 leading-relaxed">${escapeHtml(m.content)}</p>
+              <div class="text-xs text-[#1C1C1C]/40 mt-2">${new Date(m.timestamp).toLocaleString()}</div>
+            </div>
+          `;
+        });
+        ownList.innerHTML = html;
+      }
+
+      // 3. 管理员面板（如果打开）
+      if (adminPanel.classList.contains('open')) {
+        renderAdmin();
+      }
+    }
+
+    // 管理员渲染
+    function renderAdmin() {
+      const messages = getMessages();
+      if (messages.length === 0) {
+        adminList.innerHTML = '<p class="font-sans text-sm text-[#1C1C1C]/60">暂无留言。</p>';
+        return;
+      }
+      let html = '';
+      messages.sort((a, b) => b.timestamp - a.timestamp);
+      messages.forEach((m, index) => {
+        const status = m.adminPublic ? '✅ 公开' : '🔒 私有';
+        const vis = m.userPublic ? 'Public' : 'Anonymous';
+        html += `
+          <div class="message-card flex flex-wrap items-start justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap gap-2 text-sm">
+                <span class="font-serif font-bold">${m.username}</span>
+                <span class="text-xs text-[#1C1C1C]/60">${m.type}</span>
+                <span class="text-xs text-[#1C1C1C]/60">${vis}</span>
+                <span class="text-xs font-bold">${status}</span>
+              </div>
+              <p class="font-sans text-sm mt-1">${escapeHtml(m.content)}</p>
+              <div class="text-xs text-[#1C1C1C]/40">${new Date(m.timestamp).toLocaleString()}</div>
+            </div>
+            <button class="admin-toggle-btn px-3 py-1 border border-black text-xs btn-hover bg-white" data-id="${m.id}">切换公开</button>
+          </div>
+        `;
+      });
+      adminList.innerHTML = html;
+
+      // 绑定切换事件
+      document.querySelectorAll('.admin-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const id = this.dataset.id;
+          let messages = getMessages();
+          const msg = messages.find(m => m.id === id);
+          if (msg) {
+            msg.adminPublic = !msg.adminPublic;
+            saveMessages(messages);
+            renderGuestbook();
+            renderAdmin(); // 刷新管理面板
+          }
+        });
+      });
+    }
+
+    // 简易防XSS
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---------- 提交留言 ----------
+    function submitMessage(e) {
+      e.preventDefault();
+      const username = currentUser;
+      if (!username) {
+        alert('请先输入名字！');
+        return;
+      }
+      const type = msgType.value;
+      const content = msgContent.value.trim();
+      if (!content) {
+        alert('内容不能为空');
+        return;
+      }
+      const visibility = msgVisibility.value; // 'Public' or 'Anonymous'
+      const userPublic = (visibility === 'Public'); // 用户选择公开
+      const anonymous = (visibility === 'Anonymous'); // 匿名（不显示名字）
+
+      const newMsg = {
+        id: generateId(),
+        username: username,
+        type: type,
+        content: content,
+        userPublic: userPublic,    // 用户是否同意公开
+        adminPublic: false,        // 管理员默认未批准
+        anonymous: anonymous,
+        timestamp: Date.now()
+      };
+
+      const messages = getMessages();
+      messages.push(newMsg);
+      saveMessages(messages);
+
+      // 显示交付成功
+      deliveredMsg.classList.remove('hidden');
+      // 重置表单
+      msgContent.value = '';
+      msgVisibility.value = 'Public';
+      // 延迟关闭
+      setTimeout(() => {
+        writeModal.classList.remove('active');
+        deliveredMsg.classList.add('hidden');
+        renderGuestbook();
+      }, 1200);
+    }
+
+    // ---------- 导航切换 ----------
+    function switchModule(moduleId) {
+      // 更新导航高亮
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.module === moduleId) {
+          link.classList.add('active');
+        }
+      });
+      // 更新内容显示
+      moduleContents.forEach(div => {
+        div.classList.remove('active');
+        if (div.id === 'module-' + moduleId) {
+          div.classList.add('active');
+        }
+      });
+    }
+
+    // ---------- 初始化 ----------
+    function init() {
+      // 如果已有用户名，直接显示主界面
+      if (currentUser) {
+        welcome.classList.add('hidden');
+        main.classList.remove('hidden');
+        renderGuestbook();
+        return;
+      }
+
+      // 否则显示首页，等待门铃
+      welcome.classList.remove('hidden');
+      main.classList.add('hidden');
+    }
+
+    // ---------- 事件绑定 ----------
+    // 门铃按钮
+    doorbellBtn.addEventListener('click', function() {
+      nameModal.classList.add('active');
+      nameInput.value = '';
+      nameInput.focus();
+    });
+
+    // 名字模态框
+    nameCancel.addEventListener('click', function() {
+      nameModal.classList.remove('active');
+    });
+    nameConfirm.addEventListener('click', function() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert('请输入你的名字');
+        return;
+      }
+      currentUser = name;
+      localStorage.setItem(USER_KEY, name);
+      nameModal.classList.remove('active');
+      welcome.classList.add('hidden');
+      main.classList.remove('hidden');
+      renderGuestbook();
+    });
+    nameInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') nameConfirm.click();
+    });
+
+    // 写留言按钮
+    writeBtn.addEventListener('click', function() {
+      if (!currentUser) {
+        alert('请先输入名字！');
+        return;
+      }
+      writeModal.classList.add('active');
+      msgContent.value = '';
+      msgVisibility.value = 'Public';
+      deliveredMsg.classList.add('hidden');
+    });
+    writeCancel.addEventListener('click', function() {
+      writeModal.classList.remove('active');
+      deliveredMsg.classList.add('hidden');
+    });
+    messageForm.addEventListener('submit', submitMessage);
+
+    // 导航链接
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const module = this.dataset.module;
+        switchModule(module);
+        // 如果切换到guestbook，重新渲染
+        if (module === 'guestbook') {
+          renderGuestbook();
+        }
+      });
+    });
+
+    // 管理员面板
+    adminToggle.addEventListener('click', function() {
+      if (!currentUser) {
+        alert('请先登录');
+        return;
+      }
+      const pwd = prompt('请输入管理员密码：');
+      if (pwd === ADMIN_PASSWORD) {
+        adminPanel.classList.toggle('open');
+        if (adminPanel.classList.contains('open')) {
+          renderAdmin();
+        }
+      } else if (pwd !== null) {
+        alert('密码错误');
+      }
+    });
+    adminClose.addEventListener('click', function() {
+      adminPanel.classList.remove('open');
+    });
+
+    // 点击模态框外部关闭（名字模态框）
+    nameModal.addEventListener('click', function(e) {
+      if (e.target === this) nameModal.classList.remove('active');
+    });
+    writeModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        writeModal.classList.remove('active');
+        deliveredMsg.classList.add('hidden');
+      }
+    });
+
+    // 启动
+    init();
+
+  })();
+</script>
+
+</body>
+</html>
