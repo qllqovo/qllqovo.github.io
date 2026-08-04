@@ -163,20 +163,6 @@
       }
     }
 
-    /* 技能标签 */
-    .skill-tag {
-      border: 1px solid #1C1C1C;
-      padding: 0.25rem 0.75rem;
-      font-size: 0.75rem;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-      background: white;
-    }
-    .skill-tag:hover {
-      background: #1C1C1C;
-      color: #F9F8F6;
-    }
-
     /* 响应式调整 */
     @media (max-width: 640px) {
       .modal-box { padding: 1.5rem; }
@@ -216,95 +202,14 @@
 
   <!-- 内容区域 -->
   <div class="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-20">
-    
-    <!-- ======================== About Me（完全重构） ======================== -->
+    <!-- About Me -->
     <div id="module-about" class="module-content active">
-      <!-- 1. 标题区 -->
-      <div class="mb-12">
-        <h2 class="font-serif text-4xl md:text-6xl tracking-tight mb-4">About Me</h2>
-        <p class="font-sans text-lg md:text-xl text-[#1C1C1C]/80 max-w-2xl leading-relaxed tracking-wide">
-          Lifelong Learner
-        </p>
-      </div>
-
-      <!-- 2. 图文核心区（杂志跨页风格） -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-        <!-- 左侧：图片 -->
-        <div>
-          <div class="border-2 md:border-4 border-black shadow-custom overflow-hidden">
-            <!-- 👇 替换为你的真实照片（建议 600x700 或 1:1 比例，黑白/低饱和度更佳） -->
-            <img 
-              src="https://picsum.photos/seed/qllqovo/600/700" 
-              alt="qllqovo 的个人肖像" 
-              class="w-full h-auto object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-            />
-          </div>
-          <p class="font-sans text-xs uppercase tracking-wider text-[#1C1C1C]/60 mt-3 pl-1">
-            📸 日常 / 创作瞬间
-          </p>
-        </div>
-
-        <!-- 右侧：文字 -->
-        <div class="flex flex-col justify-center">
-          <h3 class="font-serif text-2xl md:text-3xl tracking-tight mb-4">
-            👋 你好，我是 qllqovo
-          </h3>
-          <p class="font-sans text-sm md:text-base leading-relaxed text-[#1C1C1C]/80 mb-4">
-            我是一位（不）热爱技术的数字创作者。目前被折磨于 Web 开发与交互设计.（我想睡觉）
-          </p>
-          <p class="font-sans text-sm md:text-base leading-relaxed text-[#1C1C1C]/80 mb-8">
-            在这个网站上，我会分享我的信息，感兴趣可以来找我玩吧！
-          </p>
-
-          <!-- 关键信息网格 -->
-          <div class="grid grid-cols-2 gap-x-6 gap-y-3 border-t-2 border-black pt-6">
-            <div>
-              <h4 class="font-serif text-xs uppercase tracking-wider text-[#1C1C1C]/60">姓名</h4>
-              <p class="font-sans text-base font-medium">qllqovo</p>
-            </div>
-            <div>
-              <h4 class="font-serif text-xs uppercase tracking-wider text-[#1C1C1C]/60">现居：无锡</h4>
-              <p class="font-sans text-base font-medium">🌍 线上 / 在路上</p>
-            </div>
-            <div>
-              <h4 class="font-serif text-xs uppercase tracking-wider text-[#1C1C1C]/60">职业</h4>
-              <p class="font-sans text-base font-medium">全栈开发者 · 创作者</p>
-            </div>
-            <div>
-              <h4 class="font-serif text-xs uppercase tracking-wider text-[#1C1C1C]/60">兴趣</h4>
-              <p class="font-sans text-base font-medium">🎨 设计 · 📚 阅读</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. 引用/信条区 -->
-      <div class="mt-12 p-6 md:p-8 border-l-4 border-black bg-white/30 max-w-3xl">
-        <p class="font-serif text-lg md:text-xl italic leading-relaxed">
-          “简洁优雅的设计，往往来源于深刻的思考与反复的打磨。”
-        </p>
-        <p class="font-sans text-xs uppercase tracking-wider mt-3 text-[#1C1C1C]/60">
-          —— qllqovo 的设计信条
-        </p>
-      </div>
-
-      <!-- 4. 技能标签云（个人化补充） -->
-      <div class="mt-10">
-        <h4 class="font-serif text-sm uppercase tracking-wider text-[#1C1C1C]/60 mb-3">
-          核心技能 / 工具
-        </h4>
-        <div class="flex flex-wrap gap-2">
-          <span class="skill-tag">HTML / CSS</span>
-          <span class="skill-tag">JavaScript</span>
-          <span class="skill-tag">React</span>
-          <span class="skill-tag">Python</span>
-          <span class="skill-tag">UI/UX 设计</span>
-          <span class="skill-tag">摄影</span>
-          <span class="skill-tag">写作</span>
-        </div>
-        <p class="font-sans text-xs text-[#1C1C1C]/40 mt-2">
-          * 标签持续更新中，点击悬停查看效果
-        </p>
+      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">About Me</h2>
+      <p class="font-sans text-sm md:text-base leading-relaxed max-w-2xl">这里是关于我的基本信息。</p>
+      <div class="mt-8 border border-black p-6 bg-white/50">
+        <p class="font-sans text-sm">👤 姓名：qllqovo</p>
+        <p class="font-sans text-sm mt-2">📧 邮箱：qllqovo@example.com</p>
+        <p class="font-sans text-sm mt-2">🌍 城市：未知</p>
       </div>
     </div>
 
@@ -386,12 +291,14 @@
 
     // ---------- 导航切换 ----------
     function switchModule(moduleId) {
+      // 更新导航高亮
       navLinks.forEach(link => {
         link.classList.remove('active');
         if (link.dataset.module === moduleId) {
           link.classList.add('active');
         }
       });
+      // 更新内容显示
       moduleContents.forEach(div => {
         div.classList.remove('active');
         if (div.id === 'module-' + moduleId) {
@@ -402,22 +309,27 @@
 
     // ---------- 初始化 ----------
     function init() {
+      // 如果已有用户名，直接显示主界面
       if (currentUser) {
         welcome.classList.add('hidden');
         main.classList.remove('hidden');
         return;
       }
+
+      // 否则显示首页，等待门铃
       welcome.classList.remove('hidden');
       main.classList.add('hidden');
     }
 
     // ---------- 事件绑定 ----------
+    // 门铃按钮
     doorbellBtn.addEventListener('click', function() {
       nameModal.classList.add('active');
       nameInput.value = '';
       nameInput.focus();
     });
 
+    // 名字模态框
     nameCancel.addEventListener('click', function() {
       nameModal.classList.remove('active');
     });
@@ -437,6 +349,7 @@
       if (e.key === 'Enter') nameConfirm.click();
     });
 
+    // 导航链接
     navLinks.forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
@@ -445,11 +358,14 @@
       });
     });
 
+    // 点击模态框外部关闭（名字模态框）
     nameModal.addEventListener('click', function(e) {
       if (e.target === this) nameModal.classList.remove('active');
     });
 
+    // 启动
     init();
+
   })();
 </script>
 
