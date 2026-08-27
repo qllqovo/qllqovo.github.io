@@ -1,373 +1,1540 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>qllqovo · 个人网站</title>
-  <!-- Tailwind CSS CDN (JIT 模式) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 自定义样式覆盖与扩展 -->
-  <style>
-    /* === 全局重置：强制无圆角 === */
-    * { border-radius: 0 !important; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>qllqovo · 个人网站</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F9F8F6;
+            color: #1C1C1C;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            background: none;
+            border: none;
+            color: inherit;
+        }
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+            font-size: inherit;
+            color: inherit;
+            background: transparent;
+            border: none;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F9F8F6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1C1C1C40;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1C1C1C60;
+        }
 
-    /* 基础色调：暖米色背景、柔和黑文字 */
-    body {
-      background-color: #F9F8F6;
-      color: #1C1C1C;
-      font-family: 'Inter', 'Helvetica Neue', sans-serif;
-    }
+        /* ===== UTILITY ===== */
+        .hidden {
+            display: none !important;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
 
-    /* 标题使用衬线字体（用系统衬线替代） */
-    .font-serif {
-      font-family: 'Georgia', 'Times New Roman', serif;
-    }
+        /* ===== EDITORIAL STYLE ===== */
+        .font-serif {
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        .font-sans {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .tracking-wide {
+            letter-spacing: 0.05em;
+        }
+        .tracking-tight {
+            letter-spacing: -0.02em;
+        }
 
-    /* 禁止所有阴影（除了自定义偏移阴影） */
-    .shadow,
-    .shadow-sm,
-    .shadow-md,
-    .shadow-lg,
-    .shadow-xl,
-    .shadow-2xl {
-      box-shadow: none !important;
-    }
+        /* ===== PAGE CONTAINERS ===== */
+        .page {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+        }
 
-    /* 自定义偏移阴影（符合规范） */
-    .shadow-custom {
-      box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
-    }
-    .shadow-custom-hover {
-      box-shadow: 4px 4px 0px 0px rgba(255, 0, 110, 1);
-    }
-    @media (min-width: 768px) {
-      .shadow-custom {
-        box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
-      }
-      .shadow-custom-hover {
-        box-shadow: 8px 8px 0px 0px rgba(255, 0, 110, 1);
-      }
-    }
+        /* ===== WELCOME PAGE ===== */
+        #welcome {
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            background-color: #F9F8F6;
+            position: relative;
+            text-align: center;
+        }
+        #welcome .welcome-inner {
+            max-width: 720px;
+            width: 100%;
+        }
+        #welcome .greeting {
+            font-size: 2.25rem;
+            line-height: 1.3;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: #1C1C1C;
+            margin-bottom: 2.5rem;
+        }
+        #welcome .greeting span {
+            font-weight: 700;
+            font-style: italic;
+        }
+        @media (min-width: 640px) {
+            #welcome .greeting {
+                font-size: 3.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            #welcome .greeting {
+                font-size: 4.5rem;
+            }
+        }
 
-    /* 卡片、按钮的过渡 */
-    .card-hover {
-      transition: all 0.2s ease;
-    }
-    .card-hover:hover {
-      box-shadow: 4px 4px 0px 0px rgba(255, 0, 110, 1);
-      transform: translateY(-2px);
-    }
-    @media (min-width: 768px) {
-      .card-hover:hover {
-        box-shadow: 8px 8px 0px 0px rgba(255, 0, 110, 1);
-        transform: translateY(-4px);
-      }
-    }
+        /* Doorbell */
+        .doorbell-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            border: 2px solid #1C1C1C;
+            background: #1C1C1C;
+            color: #F9F8F6;
+            font-size: 1rem;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        .doorbell-btn:hover {
+            background: #F9F8F6;
+            color: #1C1C1C;
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 0 #1C1C1C;
+        }
+        .doorbell-btn .bell-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
 
-    /* 按钮悬停位移效果 */
-    .btn-hover {
-      transition: all 0.15s ease;
-    }
-    .btn-hover:hover {
-      box-shadow: none !important;
-      transform: translate(2px, 2px);
-    }
-    @media (min-width: 768px) {
-      .btn-hover:hover {
-        transform: translate(4px, 4px);
-      }
-    }
+        .doorbell-ring {
+            margin-top: 2rem;
+            animation: fadeUp 0.5s ease both;
+        }
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .doorbell-ring .who-text {
+            font-size: 1.5rem;
+            font-weight: 400;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            letter-spacing: -0.01em;
+            color: #1C1C1C;
+            margin-bottom: 1rem;
+        }
+        .doorbell-ring .name-input-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .doorbell-ring .name-input-wrap input {
+            flex: 1;
+            min-width: 180px;
+            padding: 0.6rem 1rem;
+            border: 2px solid #1C1C1C;
+            background: #fff;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            border-radius: 0;
+        }
+        .doorbell-ring .name-input-wrap input:focus {
+            border-color: #1C1C1C;
+            outline: none;
+            box-shadow: inset 0 0 0 1px #1C1C1C;
+        }
+        .doorbell-ring .name-input-wrap input::placeholder {
+            color: #1C1C1C60;
+        }
+        .doorbell-ring .enter-btn {
+            padding: 0.6rem 1.6rem;
+            border: 2px solid #1C1C1C;
+            background: #1C1C1C;
+            color: #F9F8F6;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            border-radius: 0;
+        }
+        .doorbell-ring .enter-btn:hover {
+            background: #F9F8F6;
+            color: #1C1C1C;
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 0 #1C1C1C;
+        }
 
-    /* 导航链接下划线动画 */
-    .nav-link {
-      position: relative;
-      text-decoration: none;
-      color: #1C1C1C;
-      transition: color 0.2s;
-    }
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: -2px;
-      width: 0;
-      height: 2px;
-      background: #1C1C1C;
-      transition: width 0.25s ease;
-    }
-    .nav-link:hover::after {
-      width: 100%;
-    }
-    .nav-link.active {
-      font-weight: 600;
-    }
-    .nav-link.active::after {
-      width: 100%;
-    }
+        /* ===== MAIN LAYOUT ===== */
+        .main-app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-    /* 模块内容容器切换 */
-    .module-content {
-      display: none;
-    }
-    .module-content.active {
-      display: block;
-    }
+        /* Top Bar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 2px solid #1C1C1C20;
+            background: #F9F8F6;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .topbar .brand {
+            font-family: 'Georgia', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1C1C1C;
+        }
+        .topbar .brand a {
+            text-decoration: none;
+        }
+        .topbar .user-greeting {
+            font-size: 0.9rem;
+            color: #1C1C1C80;
+            font-weight: 400;
+        }
+        .topbar .user-greeting strong {
+            color: #1C1C1C;
+            font-weight: 600;
+        }
+        .topbar .back-home {
+            font-size: 0.85rem;
+            padding: 0.3rem 1rem;
+            border: 1.5px solid #1C1C1C40;
+            transition: all 0.2s;
+            background: transparent;
+            color: #1C1C1C;
+            border-radius: 0;
+        }
+        .topbar .back-home:hover {
+            border-color: #1C1C1C;
+            background: #1C1C1C;
+            color: #F9F8F6;
+            transform: translate(1px, 1px);
+            box-shadow: 3px 3px 0 0 #1C1C1C;
+        }
 
-    /* 输入框样式 */
-    input, textarea, select {
-      border: 1px solid #1C1C1C;
-      padding: 0.5rem 0.75rem;
-      font-size: 0.875rem;
-      background: #ffffff;
-      transition: border-color 0.2s;
-      outline: none;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    input:focus, textarea:focus, select:focus {
-      border-color: #1C1C1C;
-      outline: 2px solid #1C1C1C;
-      outline-offset: 0px;
-    }
-    ::placeholder {
-      color: #1C1C1C / 0.4;
-    }
+        /* ===== HOME (Grid) ===== */
+        #home {
+            flex: 1;
+            padding: 2rem 1.5rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        #home .home-title {
+            font-family: 'Georgia', serif;
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+            color: #1C1C1C;
+        }
+        #home .home-sub {
+            font-size: 0.95rem;
+            color: #1C1C1C60;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #1C1C1C10;
+            padding-bottom: 1rem;
+        }
 
-    /* 模态框 */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    .modal-overlay.active {
-      display: flex;
-    }
-    .modal-box {
-      background: #F9F8F6;
-      border: 2px solid #1C1C1C;
-      padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
-    }
-    @media (min-width: 768px) {
-      .modal-box {
-        padding: 2.5rem;
-        box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
-      }
-    }
+        .grid-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        @media (min-width: 640px) {
+            .grid-modules {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.25rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .grid-modules {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
 
-    /* 响应式调整 */
-    @media (max-width: 640px) {
-      .modal-box { padding: 1.5rem; }
-    }
-  </style>
+        .module-card {
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1.25rem;
+            border: 2px solid #1C1C1C20;
+            background: #ffffff;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-radius: 0;
+            position: relative;
+            min-height: 120px;
+        }
+        .module-card:hover {
+            border-color: #1C1C1C;
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 0 #1C1C1C10;
+        }
+        .module-card .mod-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        .module-card .mod-name {
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #1C1C1C;
+            margin-bottom: 0.2rem;
+        }
+        .module-card .mod-desc {
+            font-size: 0.8rem;
+            color: #1C1C1C60;
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid #1C1C1C08;
+        }
+        .module-card .mod-badge {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #1C1C1C40;
+            border: 1px solid #1C1C1C15;
+            padding: 0.1rem 0.5rem;
+        }
+
+        /* ===== DETAIL PAGES ===== */
+        .detail-page {
+            flex: 1;
+            padding: 2rem 1.5rem 3rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .detail-page .page-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #1C1C1C10;
+            padding-bottom: 0.75rem;
+        }
+        .detail-page .page-head h2 {
+            font-family: 'Georgia', serif;
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: #1C1C1C;
+        }
+        .detail-page .page-head .page-sub {
+            font-size: 0.85rem;
+            color: #1C1C1C50;
+        }
+
+        .detail-page .dev-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: #ffffff;
+            border: 2px solid #1C1C1C10;
+            text-align: center;
+            color: #1C1C1C60;
+            min-height: 300px;
+        }
+        .detail-page .dev-placeholder .dev-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .detail-page .dev-placeholder p {
+            font-size: 1.1rem;
+            max-width: 400px;
+        }
+
+        /* ===== GUESTBOOK ===== */
+        .guestbook-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* write button */
+        .gb-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.5rem;
+        }
+        .gb-toolbar .write-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid #1C1C1C;
+            background: transparent;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            border-radius: 0;
+            color: #1C1C1C;
+        }
+        .gb-toolbar .write-btn:hover {
+            background: #1C1C1C;
+            color: #F9F8F6;
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 0 #1C1C1C;
+        }
+
+        /* entries list */
+        .gb-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .gb-entry {
+            padding: 1rem 1.25rem;
+            border: 2px solid #1C1C1C10;
+            background: #ffffff;
+            transition: border-color 0.2s;
+            border-radius: 0;
+        }
+        .gb-entry:hover {
+            border-color: #1C1C1C30;
+        }
+        .gb-entry .entry-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+        .gb-entry .entry-author {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1C1C1C;
+        }
+        .gb-entry .entry-author.anonymous {
+            color: #1C1C1C50;
+            font-weight: 400;
+        }
+        .gb-entry .entry-type {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #1C1C1C40;
+            border: 1px solid #1C1C1C15;
+            padding: 0.05rem 0.6rem;
+        }
+        .gb-entry .entry-content {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #1C1C1C;
+            word-break: break-word;
+        }
+        .gb-entry .entry-meta {
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            color: #1C1C1C30;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .gb-entry .entry-meta .status-badge {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.05rem 0.5rem;
+            border: 1px solid #1C1C1C15;
+            color: #1C1C1C40;
+        }
+        .gb-entry .entry-meta .status-badge.public {
+            color: #1C1C1C;
+            border-color: #1C1C1C30;
+        }
+        .gb-entry .entry-meta .status-badge.private {
+            color: #1C1C1C30;
+            border-color: #1C1C1C10;
+        }
+
+        /* user's own entry (gray) */
+        .gb-entry.is-mine {
+            background: #F0EFEC;
+            border-color: #1C1C1C20;
+        }
+        .gb-entry.is-mine .entry-head .entry-author {
+            color: #1C1C1C80;
+        }
+
+        /* empty state */
+        .gb-empty {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #1C1C1C40;
+            border: 2px dashed #1C1C1C15;
+            font-size: 0.95rem;
+        }
+
+        /* ===== GUESTBOOK MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-box {
+            background: #F9F8F6;
+            max-width: 520px;
+            width: 100%;
+            padding: 2rem 1.75rem;
+            border: 2px solid #1C1C1C;
+            box-shadow: 12px 12px 0 0 #1C1C1C10;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            border-radius: 0;
+        }
+        .modal-overlay.open .modal-box {
+            transform: translateY(0);
+        }
+        .modal-box .modal-close {
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            font-size: 1.4rem;
+            line-height: 1;
+            color: #1C1C1C50;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-box .modal-close:hover {
+            color: #1C1C1C;
+        }
+        .modal-box h3 {
+            font-family: 'Georgia', serif;
+            font-size: 1.4rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.25rem;
+            color: #1C1C1C;
+        }
+        .modal-box .form-group {
+            margin-bottom: 1rem;
+        }
+        .modal-box .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #1C1C1C60;
+            margin-bottom: 0.25rem;
+        }
+        .modal-box .form-group select,
+        .modal-box .form-group textarea,
+        .modal-box .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 2px solid #1C1C1C20;
+            background: #ffffff;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            border-radius: 0;
+            color: #1C1C1C;
+        }
+        .modal-box .form-group select:focus,
+        .modal-box .form-group textarea:focus,
+        .modal-box .form-group input[type="text"]:focus {
+            border-color: #1C1C1C;
+            outline: none;
+        }
+        .modal-box .form-group textarea {
+            min-height: 80px;
+        }
+        .modal-box .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .modal-box .form-row .form-group {
+            flex: 1;
+            min-width: 120px;
+        }
+        .modal-box .submit-btn {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #1C1C1C;
+            background: #1C1C1C;
+            color: #F9F8F6;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+            border-radius: 0;
+        }
+        .modal-box .submit-btn:hover {
+            background: #F9F8F6;
+            color: #1C1C1C;
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 0 #1C1C1C;
+        }
+        .modal-box .delivered-msg {
+            text-align: center;
+            padding: 1.5rem 0;
+            font-size: 1.2rem;
+            color: #1C1C1C;
+            font-family: 'Georgia', serif;
+        }
+        .modal-box .delivered-msg span {
+            display: block;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== ADMIN PANEL (embedded) ===== */
+        .admin-panel {
+            margin-top: 2rem;
+            border-top: 2px solid #1C1C1C10;
+            padding-top: 1.5rem;
+        }
+        .admin-panel .admin-toggle {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #1C1C1C30;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.2rem 0.5rem;
+            transition: color 0.2s;
+        }
+        .admin-panel .admin-toggle:hover {
+            color: #1C1C1C60;
+        }
+        .admin-panel .admin-content {
+            margin-top: 1rem;
+        }
+        .admin-panel .admin-content .admin-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid #1C1C1C08;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .admin-panel .admin-content .admin-entry .ae-info {
+            flex: 1;
+            min-width: 140px;
+            font-size: 0.85rem;
+        }
+        .admin-panel .admin-content .admin-entry .ae-info .ae-author {
+            font-weight: 500;
+        }
+        .admin-panel .admin-content .admin-entry .ae-info .ae-type {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #1C1C1C40;
+            margin-left: 0.5rem;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions button {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.6rem;
+            border: 1.5px solid #1C1C1C20;
+            background: transparent;
+            transition: all 0.2s;
+            border-radius: 0;
+            color: #1C1C1C60;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions button:hover {
+            border-color: #1C1C1C;
+            color: #1C1C1C;
+            background: #1C1C1C08;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions .status-tag {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 0.05rem 0.5rem;
+            border: 1px solid #1C1C1C15;
+            color: #1C1C1C40;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions .status-tag.pub {
+            color: #1C1C1C;
+            border-color: #1C1C1C30;
+        }
+        .admin-panel .admin-content .admin-entry .ae-actions .status-tag.pri {
+            color: #1C1C1C20;
+            border-color: #1C1C1C10;
+        }
+        .admin-panel .admin-empty {
+            padding: 1rem 0;
+            color: #1C1C1C30;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            margin-top: auto;
+            padding: 1.5rem 1.5rem;
+            border-top: 2px solid #1C1C1C10;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #1C1C1C30;
+            letter-spacing: 0.04em;
+            background: #F9F8F6;
+        }
+        .site-footer a {
+            color: #1C1C1C50;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .site-footer a:hover {
+            color: #1C1C1C;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                gap: 0.25rem;
+            }
+            .topbar .user-greeting {
+                font-size: 0.8rem;
+            }
+            .detail-page .page-head h2 {
+                font-size: 1.6rem;
+            }
+            .modal-box {
+                padding: 1.5rem 1rem;
+            }
+            .grid-modules {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            .module-card {
+                padding: 1rem 0.75rem;
+                min-height: 90px;
+            }
+            .module-card .mod-icon {
+                font-size: 1.4rem;
+            }
+            .module-card .mod-name {
+                font-size: 0.95rem;
+            }
+            #welcome .greeting {
+                font-size: 1.8rem;
+            }
+        }
+        @media (max-width: 380px) {
+            .grid-modules {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            .module-card {
+                padding: 0.75rem 0.5rem;
+                min-height: 70px;
+            }
+            .module-card .mod-icon {
+                font-size: 1.2rem;
+            }
+            .module-card .mod-name {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ======================== 首页（欢迎） ======================== -->
-<div id="welcome" class="min-h-screen flex flex-col items-center justify-center px-6 text-center bg-[#F9F8F6]">
-  <div class="max-w-2xl">
-    <p class="text-2xl md:text-4xl font-serif tracking-tight mb-6">👋 This is qllqovo, welcome to my website!</p>
-    <!-- 门铃按钮 -->
-    <button id="doorbellBtn" class="px-8 py-4 text-sm md:text-base tracking-wide border-2 md:border-4 border-black bg-white shadow-custom btn-hover font-serif">
-      🔔 按响门铃
-    </button>
-  </div>
-</div>
+    <!-- ============================================================ -->
+    <!-- WELCOME PAGE -->
+    <!-- ============================================================ -->
+    <div id="welcome" class="page active">
+        <div class="welcome-inner">
+            <div class="greeting">
+                👋 This is <span>qllqovo</span>,<br />welcome to my website!
+            </div>
 
-<!-- ======================== 主界面 ======================== -->
-<div id="main" class="hidden min-h-screen bg-[#F9F8F6] text-[#1C1C1C]">
-  
-  <!-- 导航栏 -->
-  <nav class="bg-white border-b-2 md:border-b-4 border-black px-4 md:px-8 py-3 md:py-4 sticky top-0 z-50">
-    <div class="flex flex-wrap items-center justify-between max-w-6xl mx-auto">
-      <a href="#" class="font-serif text-xl md:text-2xl tracking-tight">qllqovo</a>
-      <div class="flex flex-wrap gap-3 md:gap-6 text-xs md:text-sm font-sans uppercase tracking-wider">
-        <a href="#" class="nav-link active" data-module="about">About</a>
-        <a href="#" class="nav-link" data-module="projects">Projects</a>
-        <a href="#" class="nav-link" data-module="contact">Contact</a>
-        <a href="#" class="nav-link" data-module="resume">Resume</a>
-        <a href="#" class="nav-link" data-module="skills">Skills</a>
-        <a href="#" class="nav-link" data-module="footprint">Footprint</a>
-      </div>
-    </div>
-  </nav>
+            <!-- Doorbell -->
+            <button class="doorbell-btn" id="doorbellBtn">
+                <span class="bell-icon">🔔</span> Ring the Doorbell
+            </button>
 
-  <!-- 内容区域 -->
-  <div class="max-w-6xl mx-auto px-4 md:px-8 py-12 md:py-20">
-    <!-- About Me -->
-    <div id="module-about" class="module-content active">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">About Me</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed max-w-2xl">这里是关于我的基本信息。</p>
-      <div class="mt-8 border border-black p-6 bg-white/50">
-        <p class="font-sans text-sm">👤 姓名：qllqovo</p>
-        <p class="font-sans text-sm mt-2">📧 邮箱：qllqovo@example.com</p>
-        <p class="font-sans text-sm mt-2">🌍 城市：未知</p>
-      </div>
+            <!-- Ring area (hidden initially) -->
+            <div id="doorbellRing" class="doorbell-ring hidden">
+                <div class="who-text">"Who's there?"</div>
+                <div class="name-input-wrap">
+                    <input type="text" id="nameInput" placeholder="Enter your name..." autocomplete="off" />
+                    <button class="enter-btn" id="enterBtn">Enter</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Projects -->
-    <div id="module-projects" class="module-content">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Projects</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed">我的项目展示，开发中……</p>
+    <!-- ============================================================ -->
+    <!-- MAIN APP (hidden until user enters) -->
+    <!-- ============================================================ -->
+    <div id="mainApp" class="page main-app">
+
+        <!-- TOP BAR -->
+        <header class="topbar">
+            <div class="brand">
+                <a href="#" id="homeLink">qllqovo</a>
+            </div>
+            <div class="user-greeting">
+                Welcome, <strong id="displayName">Guest</strong> ✦
+            </div>
+            <button class="back-home" id="backHomeBtn">← Home</button>
+        </header>
+
+        <!-- ===== HOME PAGE ===== -->
+        <section id="home" class="page active">
+            <h1 class="home-title">⌂ Studio</h1>
+            <div class="home-sub">nine rooms · click to explore</div>
+
+            <div class="grid-modules" id="moduleGrid">
+                <!-- Cards will be rendered by JS -->
+            </div>
+        </section>
+
+        <!-- ===== DETAIL PAGES ===== -->
+        <!-- About -->
+        <section id="page-about" class="detail-page page">
+            <div class="page-head">
+                <h2>About Me</h2>
+                <span class="page-sub">— who I am</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">📖</div>
+                <p>This page is under construction.<br />Come back soon to learn more about qllqovo.</p>
+            </div>
+        </section>
+
+        <!-- Projects -->
+        <section id="page-projects" class="detail-page page">
+            <div class="page-head">
+                <h2>Projects</h2>
+                <span class="page-sub">— things I build</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">⚙️</div>
+                <p>Projects are being curated.<br />Stay tuned for the showcase.</p>
+            </div>
+        </section>
+
+        <!-- Blog -->
+        <section id="page-blog" class="detail-page page">
+            <div class="page-head">
+                <h2>Blog</h2>
+                <span class="page-sub">— thoughts &amp; notes</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">✍️</div>
+                <p>No posts yet. The ink is still drying...</p>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="page-contact" class="detail-page page">
+            <div class="page-head">
+                <h2>Contact</h2>
+                <span class="page-sub">— reach out</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">✉️</div>
+                <p>Contact info coming soon.<br />For now, drop a message in the Guestbook!</p>
+            </div>
+        </section>
+
+        <!-- Resume -->
+        <section id="page-resume" class="detail-page page">
+            <div class="page-head">
+                <h2>Resume</h2>
+                <span class="page-sub">— experience &amp; skills</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">📄</div>
+                <p>Resume is being prepared.<br />Check back later.</p>
+            </div>
+        </section>
+
+        <!-- Guestbook -->
+        <section id="page-guestbook" class="detail-page page">
+            <div class="page-head">
+                <h2>Guestbook</h2>
+                <span class="page-sub">— leave your words</span>
+            </div>
+
+            <div class="guestbook-wrap">
+                <div class="gb-toolbar">
+                    <button class="write-btn" id="writeBtn">✎ Write one</button>
+                </div>
+
+                <div id="gbEntries" class="gb-entries">
+                    <!-- rendered by JS -->
+                </div>
+
+                <!-- Admin panel (hidden by default) -->
+                <div class="admin-panel" id="adminPanel">
+                    <button class="admin-toggle" id="adminToggle">⚙ admin</button>
+                    <div class="admin-content hidden" id="adminContent">
+                        <div id="adminList"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills -->
+        <section id="page-skills" class="detail-page page">
+            <div class="page-head">
+                <h2>Skills</h2>
+                <span class="page-sub">— what I know</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">🧠</div>
+                <p>Skill tree is growing.<br />More details soon.</p>
+            </div>
+        </section>
+
+        <!-- Music Playlist -->
+        <section id="page-music" class="detail-page page">
+            <div class="page-head">
+                <h2>Music Playlist</h2>
+                <span class="page-sub">— sounds I love</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">🎵</div>
+                <p>Playlist is being mixed.<br />Come back for the vibes.</p>
+            </div>
+        </section>
+
+        <!-- Footprint -->
+        <section id="page-footprint" class="detail-page page">
+            <div class="page-head">
+                <h2>Footprint</h2>
+                <span class="page-sub">— places I've been</span>
+            </div>
+            <div class="dev-placeholder">
+                <div class="dev-icon">🌍</div>
+                <p>Map is being drawn.<br />Adventures await.</p>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <span>qllqovo · 2026 · built with <a href="#" onclick="return false;">☕</a></span>
+        </footer>
     </div>
 
-    <!-- Contact -->
-    <div id="module-contact" class="module-content">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Contact</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed">联系方式，开发中……</p>
+    <!-- ============================================================ -->
+    <!-- MODAL (Guestbook write) -->
+    <!-- ============================================================ -->
+    <div class="modal-overlay" id="gbModal">
+        <div class="modal-box">
+            <button class="modal-close" id="modalClose">✕</button>
+            <h3 id="modalTitle">Leave your words</h3>
+
+            <div id="modalForm">
+                <div class="form-group">
+                    <label for="gbType">Type</label>
+                    <select id="gbType">
+                        <option value="Words">Words</option>
+                        <option value="Questions">Questions</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gbContent">Content</label>
+                    <textarea id="gbContent" placeholder="Write something..." rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="gbVisibility">Visibility</label>
+                        <select id="gbVisibility">
+                            <option value="Public">Public</option>
+                            <option value="Anonymous">Anonymous</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="submit-btn" id="gbSubmit">Deliver ✉</button>
+            </div>
+
+            <div id="modalDelivered" class="hidden">
+                <div class="delivered-msg">
+                    <span>✉</span>
+                    Delivered!
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Resume -->
-    <div id="module-resume" class="module-content">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Resume</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed">简历，开发中……</p>
-    </div>
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
 
-    <!-- Skills -->
-    <div id="module-skills" class="module-content">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Skills</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed">技能标签，开发中……</p>
-    </div>
+            // ---- DATA ----
+            const MODULES = [{
+                id: 'about',
+                icon: '👤',
+                name: 'About Me',
+                desc: 'who I am'
+            }, {
+                id: 'projects',
+                icon: '⚙️',
+                name: 'Projects',
+                desc: 'things I build'
+            }, {
+                id: 'blog',
+                icon: '✍️',
+                name: 'Blog',
+                desc: 'thoughts & notes'
+            }, {
+                id: 'contact',
+                icon: '✉️',
+                name: 'Contact',
+                desc: 'reach out'
+            }, {
+                id: 'resume',
+                icon: '📄',
+                name: 'Resume',
+                desc: 'experience & skills'
+            }, {
+                id: 'guestbook',
+                icon: '📖',
+                name: 'Guestbook',
+                desc: 'leave your words'
+            }, {
+                id: 'skills',
+                icon: '🧠',
+                name: 'Skills',
+                desc: 'what I know'
+            }, {
+                id: 'music',
+                icon: '🎵',
+                name: 'Music Playlist',
+                desc: 'sounds I love'
+            }, {
+                id: 'footprint',
+                icon: '🌍',
+                name: 'Footprint',
+                desc: 'places I\'ve been'
+            }];
 
-    <!-- Footprint -->
-    <div id="module-footprint" class="module-content">
-      <h2 class="font-serif text-3xl md:text-5xl tracking-tight mb-6">Footprint</h2>
-      <p class="font-sans text-sm md:text-base leading-relaxed">足迹地图，开发中……</p>
-    </div>
-  </div>
+            // ---- STATE ----
+            let currentUser = '';
+            let currentPage = 'home';
 
-  <!-- 页脚 -->
-  <footer class="bg-white border-t-2 md:border-t-4 border-black py-8 md:py-12 px-4 md:px-8 mt-12">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs md:text-sm">
-      <span class="font-serif tracking-tight">© qllqovo 2026</span>
-      <span class="font-sans text-[#1C1C1C]/60">Made with ✦ on GitHub Pages</span>
-    </div>
-  </footer>
-</div>
+            // ---- STORAGE ----
+            function getEntries() {
+                try {
+                    const raw = localStorage.getItem('gb_entries');
+                    return raw ? JSON.parse(raw) : [];
+                } catch { return []; }
+            }
 
-<!-- ======================== 模态框：输入名字 ======================== -->
-<div id="nameModal" class="modal-overlay">
-  <div class="modal-box">
-    <h3 class="font-serif text-2xl mb-4">🔔 Who's there?</h3>
-    <input id="nameInput" type="text" placeholder="输入你的名字..." class="mb-4" />
-    <div class="flex gap-3 justify-end">
-      <button id="nameCancel" class="px-4 py-2 border border-black text-sm btn-hover bg-white">取消</button>
-      <button id="nameConfirm" class="px-6 py-2 border-2 border-black bg-black text-white text-sm btn-hover shadow-custom">进入</button>
-    </div>
-  </div>
-</div>
+            function setEntries(entries) {
+                localStorage.setItem('gb_entries', JSON.stringify(entries));
+            }
 
-<!-- ======================== JavaScript ======================== -->
-<script>
-  (function() {
-    'use strict';
+            function getAdminStatus() {
+                return localStorage.getItem('gb_admin') === 'true';
+            }
 
-    // ---------- 存储键名 ----------
-    const USER_KEY = 'qllqovo_username';
+            function setAdminStatus(val) {
+                localStorage.setItem('gb_admin', val ? 'true' : 'false');
+            }
 
-    // ---------- 当前用户名 ----------
-    let currentUser = localStorage.getItem(USER_KEY) || '';
+            // ---- DOM refs ----
+            const welcomePage = document.getElementById('welcome');
+            const mainApp = document.getElementById('mainApp');
+            const doorbellBtn = document.getElementById('doorbellBtn');
+            const doorbellRing = document.getElementById('doorbellRing');
+            const nameInput = document.getElementById('nameInput');
+            const enterBtn = document.getElementById('enterBtn');
+            const displayName = document.getElementById('displayName');
+            const backHomeBtn = document.getElementById('backHomeBtn');
+            const homeLink = document.getElementById('homeLink');
+            const moduleGrid = document.getElementById('moduleGrid');
+            const gbEntries = document.getElementById('gbEntries');
+            const writeBtn = document.getElementById('writeBtn');
+            const gbModal = document.getElementById('gbModal');
+            const modalClose = document.getElementById('modalClose');
+            const modalForm = document.getElementById('modalForm');
+            const modalDelivered = document.getElementById('modalDelivered');
+            const modalTitle = document.getElementById('modalTitle');
+            const gbType = document.getElementById('gbType');
+            const gbContent = document.getElementById('gbContent');
+            const gbVisibility = document.getElementById('gbVisibility');
+            const gbSubmit = document.getElementById('gbSubmit');
+            const adminPanel = document.getElementById('adminPanel');
+            const adminToggle = document.getElementById('adminToggle');
+            const adminContent = document.getElementById('adminContent');
+            const adminList = document.getElementById('adminList');
 
-    // ---------- DOM 引用 ----------
-    const welcome = document.getElementById('welcome');
-    const main = document.getElementById('main');
-    const doorbellBtn = document.getElementById('doorbellBtn');
-    const nameModal = document.getElementById('nameModal');
-    const nameInput = document.getElementById('nameInput');
-    const nameCancel = document.getElementById('nameCancel');
-    const nameConfirm = document.getElementById('nameConfirm');
+            // ---- PAGE NAVIGATION ----
+            function showPage(pageId) {
+                // hide all pages
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById(pageId);
+                if (target) target.classList.add('active');
+                currentPage = pageId;
+                // scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
 
-    // 所有导航链接
-    const navLinks = document.querySelectorAll('.nav-link');
-    const moduleContents = document.querySelectorAll('.module-content');
+            function goHome() {
+                showPage('home');
+                renderModules();
+            }
 
-    // ---------- 导航切换 ----------
-    function switchModule(moduleId) {
-      // 更新导航高亮
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.dataset.module === moduleId) {
-          link.classList.add('active');
-        }
-      });
-      // 更新内容显示
-      moduleContents.forEach(div => {
-        div.classList.remove('active');
-        if (div.id === 'module-' + moduleId) {
-          div.classList.add('active');
-        }
-      });
-    }
+            function goToModule(moduleId) {
+                const pageId = 'page-' + moduleId;
+                showPage(pageId);
+                // if guestbook, render entries
+                if (moduleId === 'guestbook') {
+                    renderGuestbook();
+                }
+            }
 
-    // ---------- 初始化 ----------
-    function init() {
-      // 如果已有用户名，直接显示主界面
-      if (currentUser) {
-        welcome.classList.add('hidden');
-        main.classList.remove('hidden');
-        return;
-      }
+            // ---- RENDER MODULES ----
+            function renderModules() {
+                moduleGrid.innerHTML = '';
+                MODULES.forEach(mod => {
+                    const card = document.createElement('div');
+                    card.className = 'module-card';
+                    card.setAttribute('data-module', mod.id);
+                    card.innerHTML = `
+                        <div class="mod-icon">${mod.icon}</div>
+                        <div class="mod-name">${mod.name}</div>
+                        <div class="mod-desc">${mod.desc}</div>
+                        <div class="mod-badge">→</div>
+                    `;
+                    card.addEventListener('click', () => goToModule(mod.id));
+                    moduleGrid.appendChild(card);
+                });
+            }
 
-      // 否则显示首页，等待门铃
-      welcome.classList.remove('hidden');
-      main.classList.add('hidden');
-    }
+            // ---- GUESTBOOK ----
+            function renderGuestbook() {
+                const entries = getEntries();
+                const myName = currentUser.trim() || 'Guest';
 
-    // ---------- 事件绑定 ----------
-    // 门铃按钮
-    doorbellBtn.addEventListener('click', function() {
-      nameModal.classList.add('active');
-      nameInput.value = '';
-      nameInput.focus();
-    });
+                // filter public entries: user public + admin public (for Words)
+                const publicEntries = entries.filter(e => {
+                    if (e.type === 'Questions') {
+                        // Questions: only user's visibility matters (Public or Anonymous)
+                        return e.visibility === 'Public' || e.visibility === 'Anonymous';
+                    } else { // Words
+                        // need both user public and admin public
+                        if (e.visibility === 'Anonymous') {
+                            // Anonymous: show if admin public
+                            return e.adminStatus === 'public';
+                        } else { // Public
+                            return e.adminStatus === 'public';
+                        }
+                    }
+                });
 
-    // 名字模态框
-    nameCancel.addEventListener('click', function() {
-      nameModal.classList.remove('active');
-    });
-    nameConfirm.addEventListener('click', function() {
-      const name = nameInput.value.trim();
-      if (!name) {
-        alert('请输入你的名字');
-        return;
-      }
-      currentUser = name;
-      localStorage.setItem(USER_KEY, name);
-      nameModal.classList.remove('active');
-      welcome.classList.add('hidden');
-      main.classList.remove('hidden');
-    });
-    nameInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') nameConfirm.click();
-    });
+                // my entries (for gray bottom section)
+                const myEntries = entries.filter(e => e.author === myName);
 
-    // 导航链接
-    navLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const module = this.dataset.module;
-        switchModule(module);
-      });
-    });
+                // sort by time desc
+                const sortedPublic = publicEntries.slice().sort((a, b) => b.timestamp - a.timestamp);
+                const sortedMy = myEntries.slice().sort((a, b) => b.timestamp - a.timestamp);
 
-    // 点击模态框外部关闭（名字模态框）
-    nameModal.addEventListener('click', function(e) {
-      if (e.target === this) nameModal.classList.remove('active');
-    });
+                if (sortedPublic.length === 0 && sortedMy.length === 0) {
+                    gbEntries.innerHTML = `<div class="gb-empty">No words yet. Be the first to write ✨</div>`;
+                } else {
+                    let html = '';
 
-    // 启动
-    init();
+                    // Public entries
+                    sortedPublic.forEach(e => {
+                        const isAnon = e.visibility === 'Anonymous';
+                        const authorDisplay = isAnon ? 'Anonymous' : e.author;
+                        const authorClass = isAnon ? 'anonymous' : '';
+                        const typeLabel = e.type || 'Words';
+                        const statusLabel = e.adminStatus === 'public' ? 'public' : 'private';
+                        html += `
+                            <div class="gb-entry">
+                                <div class="entry-head">
+                                    <span class="entry-author ${authorClass}">${authorDisplay}</span>
+                                    <span class="entry-type">${typeLabel}</span>
+                                </div>
+                                <div class="entry-content">${escapeHtml(e.content)}</div>
+                                <div class="entry-meta">
+                                    <span>${formatTime(e.timestamp)}</span>
+                                    <span class="status-badge ${statusLabel}">${statusLabel}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
 
-  })();
-</script>
+                    // My entries (gray, at bottom)
+                    if (sortedMy.length > 0) {
+                        html += `<div style="margin-top:1.5rem;border-top:2px solid #1C1C1C10;padding-top:1rem;"></div>`;
+                        sortedMy.forEach(e => {
+                            const isAnon = e.visibility === 'Anonymous';
+                            const authorDisplay = isAnon ? 'Anonymous' : e.author;
+                            const authorClass = isAnon ? 'anonymous' : '';
+                            const typeLabel = e.type || 'Words';
+                            const statusLabel = e.adminStatus === 'public' ? 'public' : 'private';
+                            const isPublic = (e.type === 'Questions' && (e.visibility === 'Public' || e
+                                .visibility === 'Anonymous')) ||
+                                (e.type === 'Words' && e.adminStatus === 'public');
+                            html += `
+                                <div class="gb-entry is-mine">
+                                    <div class="entry-head">
+                                        <span class="entry-author ${authorClass}">${authorDisplay} ✦</span>
+                                        <span class="entry-type">${typeLabel}</span>
+                                    </div>
+                                    <div class="entry-content">${escapeHtml(e.content)}</div>
+                                    <div class="entry-meta">
+                                        <span>${formatTime(e.timestamp)}</span>
+                                        <span class="status-badge ${isPublic ? 'public' : 'private'}">${isPublic ? 'public' : 'private'}</span>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    gbEntries.innerHTML = html;
+                }
+
+                // Admin
+                renderAdminPanel();
+            }
+
+            // ---- ADMIN PANEL ----
+            function renderAdminPanel() {
+                const entries = getEntries();
+                const myName = currentUser.trim() || 'Guest';
+                const isAdmin = (myName === 'qllqovo');
+
+                if (!isAdmin) {
+                    adminPanel.style.display = 'none';
+                    return;
+                }
+                adminPanel.style.display = 'block';
+
+                // only show Words that need admin action
+                const words = entries.filter(e => e.type === 'Words');
+                if (words.length === 0) {
+                    adminList.innerHTML = `<div class="admin-empty">No Words entries to moderate.</div>`;
+                    return;
+                }
+
+                let html = '';
+                words.forEach((e, idx) => {
+                    const status = e.adminStatus || 'private';
+                    const isPub = status === 'public';
+                    html += `
+                        <div class="admin-entry" data-idx="${idx}">
+                            <div class="ae-info">
+                                <span class="ae-author">${e.author}</span>
+                                <span class="ae-type">${e.visibility === 'Anonymous' ? 'anon' : 'public'}</span>
+                                <span style="font-size:0.75rem;color:#1C1C1C50;display:block;margin-top:0.1rem;">${escapeHtml(e.content.substring(0, 40))}${e.content.length > 40 ? '…' : ''}</span>
+                            </div>
+                            <div class="ae-actions">
+                                <span class="status-tag ${isPub ? 'pub' : 'pri'}">${status}</span>
+                                <button class="admin-set" data-action="${isPub ? 'private' : 'public'}">${isPub ? '→ private' : '→ public'}</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                adminList.innerHTML = html;
+
+                // attach events
+                adminList.querySelectorAll('.admin-set').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const entryDiv = this.closest('.admin-entry');
+                        const idx = parseInt(entryDiv.dataset.idx, 10);
+                        const action = this.dataset.action; // 'public' or 'private'
+                        const entries2 = getEntries();
+                        const wordEntries = entries2.filter(ent => ent.type === 'Words');
+                        if (wordEntries[idx]) {
+                            wordEntries[idx].adminStatus = action;
+                            // update in main array
+                            let count = 0;
+                            for (let i = 0; i < entries2.length; i++) {
+                                if (entries2[i].type === 'Words') {
+                                    if (count === idx) {
+                                        entries2[i].adminStatus = action;
+                                        break;
+                                    }
+                                    count++;
+                                }
+                            }
+                            setEntries(entries2);
+                            renderGuestbook();
+                        }
+                    });
+                });
+            }
+
+            // ---- WRITE MODAL ----
+            function openModal() {
+                modalForm.classList.remove('hidden');
+                modalDelivered.classList.add('hidden');
+                modalTitle.textContent = 'Leave your words';
+                gbContent.value = '';
+                gbType.value = 'Words';
+                gbVisibility.value = 'Public';
+                gbModal.classList.add('open');
+            }
+
+            function closeModal() {
+                gbModal.classList.remove('open');
+            }
+
+            function submitEntry() {
+                const type = gbType.value;
+                const content = gbContent.value.trim();
+                const visibility = gbVisibility.value;
+                const author = currentUser.trim() || 'Anonymous';
+
+                if (!content) {
+                    alert('Please write something.');
+                    return;
+                }
+
+                const entries = getEntries();
+                const newEntry = {
+                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                    author: author,
+                    type: type,
+                    content: content,
+                    visibility: visibility,
+                    timestamp: Date.now(),
+                    adminStatus: 'private' // default for Words
+                };
+                entries.push(newEntry);
+                setEntries(entries);
+
+                // Show delivered
+                modalForm.classList.add('hidden');
+                modalDelivered.classList.remove('hidden');
+                modalTitle.textContent = '✉ Delivered!';
+
+                // Auto close after 1.5s
+                setTimeout(() => {
+                    closeModal();
+                    renderGuestbook();
+                }, 1500);
+            }
+
+            // ---- HELPERS ----
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function formatTime(ts) {
+                const d = new Date(ts);
+                const now = new Date();
+                const diff = now - d;
+                if (diff < 60000) return 'just now';
+                if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+                if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+                return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+
+            // ---- ENTER APP ----
+            function enterApp(name) {
+                const trimmed = name.trim();
+                if (!trimmed) {
+                    alert('Please enter your name to enter.');
+                    return;
+                }
+                currentUser = trimmed;
+                displayName.textContent = trimmed;
+
+                // Hide welcome, show main
+                welcomePage.classList.remove('active');
+                mainApp.classList.add('active');
+                welcomePage.style.display = 'none';
+                mainApp.style.display = 'flex';
+
+                // init home
+                renderModules();
+                goHome();
+            }
+
+            // ---- EVENT BINDINGS ----
+
+            // Doorbell
+            doorbellBtn.addEventListener('click', function() {
+                doorbellRing.classList.remove('hidden');
+                doorbellBtn.disabled = true;
+                doorbellBtn.style.opacity = '0.4';
+                nameInput.focus();
+            });
+
+            nameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    enterApp(nameInput.value);
+                }
+            });
+
+            enterBtn.addEventListener('click', function() {
+                enterApp(nameInput.value);
+            });
+
+            // Back home
+            backHomeBtn.addEventListener('click', goHome);
+            homeLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                goHome();
+            });
+
+            // Modal
+            writeBtn.addEventListener('click', openModal);
+            modalClose.addEventListener('click', closeModal);
+            gbModal.addEventListener('click', function(e) {
+                if (e.target === gbModal) closeModal();
+            });
+            gbSubmit.addEventListener('click', submitEntry);
+
+            // Admin toggle
+            adminToggle.addEventListener('click', function() {
+                const content = adminContent;
+                content.classList.toggle('hidden');
+                if (!content.classList.contains('hidden')) {
+                    renderAdminPanel();
+                }
+            });
+
+            // keyboard shortcut: Escape closes modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // ---- INIT ----
+            // If user already entered (refresh), we could check localStorage
+            // but we keep it simple: always start at welcome.
+
+            // Pre-fill name if in localStorage?
+            const savedName = localStorage.getItem('gb_username');
+            if (savedName) {
+                nameInput.value = savedName;
+            }
+
+            // when entering, save name
+            const origEnter = enterApp;
+            enterApp = function(name) {
+                origEnter(name);
+                localStorage.setItem('gb_username', name);
+            };
+
+            // ---- KEYBOARD: Enter on name input ----
+            // already handled
+
+            console.log('✦ qllqovo website loaded ✦');
+
+        })();
+    </script>
 
 </body>
 </html>
