@@ -130,6 +130,8 @@ const DEFAULT_DATA = {
 
   blog: [],
 
+  performances: [],
+
   contact: {
     note: "Whether it is a role, a collaboration, or just a hello — my inbox is always open. I usually reply within a day.",
     items: [
@@ -326,7 +328,9 @@ function unionById(a, b) {
    - Guestbook entries and blog comments: union by id, so
      comments left on THIS device are never wiped by a pull. */
 function unionMerge(remote, local) {
-  const out = cloneData(remote || {});
+  /* Start from the defaults so fields added in later site versions (e.g.
+     performances) always exist even when the cloud copy is older. */
+  const out = deepMerge(cloneData(DEFAULT_DATA), remote || {});
   if (local && local.guestbook) {
     if (!out.guestbook) out.guestbook = {};
     out.guestbook.entries = unionById(
@@ -347,6 +351,12 @@ function unionMerge(remote, local) {
     });
     local.blog.forEach(function (p) {
       if (p && p.id && !remoteIds.has(p.id)) out.blog.push(p);
+    });
+  }
+  if (local && Array.isArray(local.performances) && Array.isArray(out.performances)) {
+    const localIds = new Set(out.performances.map(function (p) { return p && p.id; }));
+    local.performances.forEach(function (p) {
+      if (p && p.id && !localIds.has(p.id)) out.performances.push(p);
     });
   }
   return out;

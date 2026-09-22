@@ -9,6 +9,25 @@
 <link rel="preconnect" href="https://miaoda.feishu.cn">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* ---- performances (节目) ---- */
+.perf-card { padding: 30px 0 34px; border-top: var(--line); }
+.perf-card:last-child { border-bottom: var(--line); }
+.perf-media { position: relative; width: 100%; aspect-ratio: 16/9; background: #EDEBE7; border: var(--line); }
+.perf-media video, .perf-media iframe { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border: 0; }
+.perf-embed { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; cursor: pointer; }
+.perf-play { width: 62px; height: 62px; border-radius: 50%; border: 1px solid var(--ink); background: transparent; color: var(--ink); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .18s ease; }
+.perf-play:hover { background: var(--ink); color: var(--bg); }
+.perf-play-label { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-60); font-weight: 600; }
+.perf-watch { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+.perf-card h3 { font-size: 1.15rem; margin-top: 14px; margin-bottom: 4px; }
+.perf-meta { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-40); font-weight: 600; }
+.zh-note { font-family: var(--sans); font-size: 0.45em; font-weight: 500; letter-spacing: 0.22em; color: var(--ink-40); margin-left: 10px; }
+@media (max-width: 700px) {
+  .perf-card { padding: 22px 0 26px; }
+  .perf-play { width: 52px; height: 52px; }
+}
+</style>
 </head>
 <body>
 
@@ -52,6 +71,20 @@
       <div id="skill-groups"></div>
       <div id="skill-add-slot" style="display:none;">
         <button class="add-btn" id="skill-add-btn">+ Add a skill</button>
+      </div>
+    </div>
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Stage &amp; screen</p>
+          <h2>Performances<span class="zh-note">节目</span></h2>
+        </div>
+        <span class="idx" id="perf-count">0 videos</span>
+      </div>
+      <div id="perf-list"></div>
+      <div id="perf-add-slot" style="display:none;">
+        <button class="add-btn" id="perf-add-btn">+ Add a video</button>
       </div>
     </div>
   </section>
@@ -125,6 +158,80 @@ function renderSkills() {
   applyEditState();
 }
 
+/* ---------- performances (节目): owner adds videos, guests watch ---------- */
+function perfDateNow() {
+  const d = new Date();
+  return d.getFullYear() + "." + String(d.getMonth() + 1).padStart(2, "0") + "." + String(d.getDate()).padStart(2, "0");
+}
+function perfKindFromUrl(url) {
+  const u = String(url || "").trim();
+  if (!u) return null;
+  const bv = u.match(/\/video\/(BV[0-9A-Za-z]+)/);
+  if (bv) return { kind: "bilibili", id: bv[1] };
+  const yt = u.match(/(?:[?&]v=|youtu\.be\/|\/embed\/)([0-9A-Za-z_-]{11})/);
+  if (yt) return { kind: "youtube", id: yt[1] };
+  if (/\.(mp4|webm|ogv|ogg|mov)(\?|#|$)/i.test(u)) return { kind: "mp4", id: "" };
+  if (/^https?:\/\//i.test(u)) return { kind: "other", id: "" };
+  return null;
+}
+function perfMediaHtml(p) {
+  if (p.kind === "data" && p.data) {
+    return '<video controls preload="metadata" src="' + p.data + '"></video>';
+  }
+  if (p.kind === "mp4" && p.url) {
+    return '<video controls preload="metadata" src="' + esc(p.url) + '"></video>';
+  }
+  if ((p.kind === "bilibili" || p.kind === "youtube") && p.embedId) {
+    return '<div class="perf-embed" data-embed="' + p.kind + ":" + p.embedId + '">' +
+      '<button type="button" class="perf-play" aria-label="Play video"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>' +
+      '<span class="perf-play-label">Play video</span></div>';
+  }
+  return '<a class="perf-watch" href="' + esc(p.url || "#") + '" target="_blank" rel="noopener">Watch video ↗</a>';
+}
+let _perfFirstRender = true;
+function renderPerformances() {
+  const data = loadData();
+  const list = data.performances || [];
+  const host = document.getElementById("perf-list");
+  if (!host) return;
+  host.innerHTML = "";
+  document.getElementById("perf-count").textContent = list.length + (list.length === 1 ? " video" : " videos");
+  if (!list.length) {
+    host.innerHTML = emptyState("No performances yet", "The owner will add stage videos after signing in.");
+    _perfFirstRender = false;
+    return;
+  }
+  list.slice().reverse().forEach(function (p) {
+    const card = document.createElement("article");
+    card.className = "perf-card reveal";
+    card.innerHTML =
+      '<div class="perf-media">' + perfMediaHtml(p) + "</div>" +
+      "<h3>" + esc(p.title || "Untitled") + "</h3>" +
+      '<div class="perf-meta">' + esc(p.date || "") + "</div>" +
+      '<div class="flex gap-1 mt-1" style="display:none;" data-pdel-row>' +
+        '<button class="del-btn danger" data-pdel="' + p.id + '">Delete</button>' +
+      "</div>";
+    host.appendChild(card);
+  });
+  if (!_perfFirstRender) {
+    host.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+  _perfFirstRender = false;
+}
+function perfFormHtml() {
+  return (
+    '<form id="perf-form">' +
+      '<p class="eyebrow">New performance</p><h3>Add a video</h3>' +
+      '<div class="field"><label>Title</label><input type="text" id="pf-title" required placeholder="e.g. CNY Gala — opening dance"></div>' +
+      '<div class="field"><label>Video link</label><input type="text" id="pf-url" placeholder="https://www.bilibili.com/video/BV…  ·  YouTube  ·  …direct .mp4"></div>' +
+      '<p class="muted2 small" style="margin:-8px 0 16px;">Paste a link, or upload a small clip (≤ 2 MB).</p>' +
+      '<div class="field"><label>Upload a clip</label><input type="file" id="pf-file" accept="video/*">' +
+        '<p id="pf-info" class="muted2 small" style="min-height:1.2em; margin-top:8px;"></p></div>' +
+      '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add video</button></div>' +
+    '</form>'
+  );
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   renderSkills();
 
@@ -188,7 +295,73 @@ document.addEventListener("DOMContentLoaded", function () {
     return data.skills.map(function (g, i) { return '<option value="' + i + '">' + esc(g.category) + "</option>"; }).join("");
   }
 
-  window.__pageRender = renderSkills;
+  renderPerformances();
+  document.addEventListener("qledit", function () {
+    document.getElementById("perf-add-slot").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll("[data-pdel-row]").forEach(function (r) {
+      r.style.display = isEditMode() ? "flex" : "none";
+    });
+  });
+  document.getElementById("perf-list").addEventListener("click", function (e) {
+    const pb = e.target.closest(".perf-play");
+    if (pb) {
+      const box = pb.closest(".perf-embed");
+      if (!box) return;
+      const parts = box.getAttribute("data-embed").split(":");
+      const srcIf = parts[0] === "bilibili"
+        ? "https://player.bilibili.com/player.html?bvid=" + parts[1] + "&page=1&high_quality=1&danmaku=0"
+        : "https://www.youtube-nocookie.com/embed/" + parts[1];
+      box.innerHTML = '<iframe src="' + srcIf + '" allowfullscreen allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"></iframe>';
+      return;
+    }
+    const btn = e.target.closest("[data-pdel]");
+    if (!btn) return;
+    const data = loadData();
+    data.performances = (data.performances || []).filter(function (p) { return p.id !== btn.getAttribute("data-pdel"); });
+    saveData(data);
+    renderPerformances();
+    toast("Video removed.");
+  });
+  document.getElementById("perf-add-btn").addEventListener("click", function () {
+    const body = openModal(perfFormHtml());
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    const info = body.querySelector("#pf-info");
+    body.querySelector("#pf-file").addEventListener("change", function () {
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const mb = (f.size / 1024 / 1024).toFixed(2);
+      info.textContent = f.name + " · " + mb + " MB" + (f.size > 2 * 1024 * 1024 ? " — too large, use a link instead." : " — ready.");
+    });
+    body.querySelector("#perf-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const title = body.querySelector("#pf-title").value.trim();
+      const url = body.querySelector("#pf-url").value.trim();
+      const file = body.querySelector("#pf-file").files && body.querySelector("#pf-file").files[0];
+      if (!title) { toast("Give the video a title."); return; }
+      if (url) {
+        const parsed = perfKindFromUrl(url);
+        if (!parsed) { toast("That link is not supported — use Bilibili, YouTube or a direct .mp4 URL."); return; }
+        const data = loadData();
+        data.performances.push({ id: uid("perf"), title: title, date: perfDateNow(), kind: parsed.kind, embedId: parsed.id || "", url: url });
+        saveData(data); closeModal(); renderPerformances(); toast("Video added.");
+        return;
+      }
+      if (file) {
+        if (file.size > 2 * 1024 * 1024) { toast("That clip is too large — paste a link instead (e.g. Bilibili)."); return; }
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          const data = loadData();
+          data.performances.push({ id: uid("perf"), title: title, date: perfDateNow(), kind: "data", data: ev.target.result });
+          saveData(data); closeModal(); renderPerformances(); toast("Video added.");
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
+      toast("Paste a video link or choose a clip.");
+    });
+  });
+
+  window.__pageRender = function () { renderSkills(); renderPerformances(); };
 initShell();
 });
 </script>
