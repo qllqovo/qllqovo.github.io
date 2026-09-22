@@ -10,6 +10,15 @@
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
 <style>
+/* ---- hobbies (爱好) ---- */
+.hobby-tags { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 4px; }
+.hobby-tag { display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; border: 1px solid var(--ink); background: transparent; font-size: .92rem; line-height: 1.45; }
+.hobby-x { border: 0; background: none; color: var(--ink-40); font-size: 1.05rem; line-height: 1; padding: 0 0 0 2px; cursor: pointer; display: inline-flex; align-items: center; }
+.hobby-x:hover { color: var(--ink); }
+@media (max-width: 700px) {
+  .hobby-tag { padding: 6px 13px; font-size: .88rem; }
+}
+
 /* ---- performances (节目) ---- */
 .perf-card { padding: 30px 0 34px; border-top: var(--line); }
 .perf-card:last-child { border-bottom: var(--line); }
@@ -73,6 +82,24 @@
         <button class="add-btn" id="skill-add-btn">+ Add a skill</button>
       </div>
     </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Off the clock</p>
+          <h2>Hobbies<span class="zh-note">爱好</span></h2>
+        </div>
+        <span class="idx" id="hobby-count">0 tags</span>
+      </div>
+      <div id="hobby-tags"></div>
+      <div id="hobby-add-slot" style="display:none;">
+        <button class="add-btn" id="hobby-add-btn">+ Add a hobby</button>
+      </div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container">
       <div class="section-head reveal">
@@ -156,6 +183,48 @@ function renderSkills() {
     host.innerHTML = emptyState("No skills listed", "The owner can add skills after signing in.");
   }
   applyEditState();
+}
+
+/* ---------- hobbies (爱好): tag chips — owner adds/removes, guests just read ---------- */
+let _hobbyFirstRender = true;
+function renderHobbies() {
+  const data = loadData();
+  const tags = data.hobbies || [];
+  const host = document.getElementById("hobby-tags");
+  if (!host) return;
+  host.innerHTML = "";
+  document.getElementById("hobby-count").textContent = tags.length + (tags.length === 1 ? " tag" : " tags");
+  if (!tags.length) {
+    host.innerHTML = emptyState("No hobbies yet", "The owner will add hobby tags after signing in.");
+    _hobbyFirstRender = false;
+    return;
+  }
+  tags.forEach(function (t, i) {
+    const chip = document.createElement("span");
+    chip.className = "hobby-tag reveal";
+    chip.innerHTML =
+      esc(t) +
+      '<button type="button" class="hobby-x" data-hdel="' + i + '" aria-label="Remove tag">×</button>';
+    host.appendChild(chip);
+  });
+  if (!_hobbyFirstRender) {
+    host.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
+  }
+  _hobbyFirstRender = false;
+  /* freshly rendered chips must respect the current edit mode */
+  const editingNow = isEditMode();
+  host.querySelectorAll(".hobby-x").forEach(function (b) {
+    b.style.display = editingNow ? "inline-flex" : "none";
+  });
+}
+function hobbyFormHtml() {
+  return (
+    '<form id="hobby-form">' +
+      '<p class="eyebrow">New hobby</p><h3>Add a hobby</h3>' +
+      '<div class="field"><label>Tag</label><input type="text" id="hf-name" required placeholder="e.g. Debating · Dancing · Photography"></div>' +
+      '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add tag</button></div>' +
+    '</form>'
+  );
 }
 
 /* ---------- performances (节目): owner adds videos, guests watch ---------- */
@@ -301,6 +370,37 @@ document.addEventListener("DOMContentLoaded", function () {
     return data.skills.map(function (g, i) { return '<option value="' + i + '">' + esc(g.category) + "</option>"; }).join("");
   }
 
+  renderHobbies();
+  document.addEventListener("qledit", function () {
+    document.getElementById("hobby-add-slot").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll(".hobby-x").forEach(function (b) {
+      b.style.display = isEditMode() ? "inline-flex" : "none";
+    });
+  });
+  document.getElementById("hobby-tags").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-hdel]");
+    if (!btn) return;
+    const data = loadData();
+    data.hobbies = (data.hobbies || []).filter(function (_, i) { return i !== Number(btn.getAttribute("data-hdel")); });
+    saveData(data);
+    renderHobbies();
+    toast("Hobby removed.");
+  });
+  document.getElementById("hobby-add-btn").addEventListener("click", function () {
+    const body = openModal(hobbyFormHtml());
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    body.querySelector("#hobby-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = body.querySelector("#hf-name").value.trim();
+      if (!name) { toast("Type a hobby tag first."); return; }
+      const data = loadData();
+      data.hobbies = data.hobbies || [];
+      if (data.hobbies.indexOf(name) >= 0) { toast("That tag already exists."); return; }
+      data.hobbies.push(name);
+      saveData(data); closeModal(); renderHobbies(); toast("Hobby added.");
+    });
+  });
+
   renderPerformances();
   document.addEventListener("qledit", function () {
     document.getElementById("perf-add-slot").style.display = isEditMode() ? "block" : "none";
@@ -367,7 +467,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  window.__pageRender = function () { renderSkills(); renderPerformances(); };
+  window.__pageRender = function () { renderSkills(); renderHobbies(); renderPerformances(); };
 initShell();
 });
 </script>

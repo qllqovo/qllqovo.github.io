@@ -132,6 +132,8 @@ const DEFAULT_DATA = {
 
   performances: [],
 
+  hobbies: [],
+
   contact: {
     note: "Whether it is a role, a collaboration, or just a hello — my inbox is always open. I usually reply within a day.",
     items: [
@@ -357,6 +359,12 @@ function unionMerge(remote, local) {
     const localIds = new Set(out.performances.map(function (p) { return p && p.id; }));
     local.performances.forEach(function (p) {
       if (p && p.id && !localIds.has(p.id)) out.performances.push(p);
+    });
+  }
+  if (local && Array.isArray(local.hobbies) && Array.isArray(out.hobbies)) {
+    const seen = new Set(out.hobbies);
+    local.hobbies.forEach(function (t) {
+      if (t && !seen.has(t)) { out.hobbies.push(t); seen.add(t); }
     });
   }
   return out;
