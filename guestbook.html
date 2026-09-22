@@ -38,6 +38,8 @@
 .gb-status-tag { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--ink-25); color: var(--ink-40); }
 .gb-status-tag.pub { border-color: var(--ink); color: var(--ink); }
 .gb-status-tag.priv { border-color: var(--ink-25); color: var(--ink-40); }
+/* the hint line turns into the question itself once the bell is rung */
+.shake-hint.shown { text-transform: none; font-size: 1.08rem; letter-spacing: 0.01em; color: var(--ink-80); font-family: var(--serif); }
 </style>
 </head>
 <body>
@@ -348,6 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
   /* ---------- shake shake ---------- */
   const stage = document.getElementById("shake-stage");
   const qEl = document.getElementById("shake-q");
+  const hintEl = document.querySelector(".shake-hint");
   const shakeForm = document.getElementById("shake-form");
 
   function shake() {
@@ -361,6 +364,8 @@ document.addEventListener("DOMContentLoaded", function () {
     SHAKE_INDEX = (SHAKE_INDEX + 1) % pool.length;
     setTimeout(function () {
       qEl.textContent = pool[SHAKE_INDEX];
+      hintEl.textContent = pool[SHAKE_INDEX];
+      hintEl.classList.add("shown");
       shakeForm.style.display = "block";
     }, 260);
   }

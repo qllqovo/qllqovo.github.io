@@ -9,23 +9,6 @@
 <link rel="preconnect" href="https://miaoda.feishu.cn">
 <link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="css/style.css">
-<style>
-/* ---- doorbell question box (游客点门铃随机问题) ---- */
-.qbox-mask { position: fixed; inset: 0; z-index: 90; background: rgba(249,248,246,0.9); display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; transition: opacity .22s ease; }
-.qbox-mask[hidden] { display: none; }
-.qbox-mask.open { opacity: 1; }
-.qbox { max-width: 580px; width: 100%; background: var(--bg); border: 1px solid var(--ink-14); padding: 48px 40px 38px; text-align: center; position: relative; box-shadow: 0 18px 50px rgba(28,28,28,0.10); }
-.qbox-close { position: absolute; top: 8px; right: 14px; border: 0; background: none; font-size: 1.5rem; line-height: 1; color: var(--ink-40); cursor: pointer; padding: 6px; }
-.qbox-close:hover { color: var(--ink); }
-.qbox-q { font-family: var(--serif); font-size: clamp(1.35rem, 4.4vw, 1.95rem); line-height: 1.4; margin: 20px 0 16px; }
-.qbox-hint { color: var(--ink-60); font-size: 0.9rem; margin-bottom: 30px; }
-.qbox-hint a { text-decoration: underline; text-underline-offset: 3px; }
-.qbox-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.qbox-again { border: 1px solid var(--ink-40); background: none; color: var(--ink-80); padding: 10px 20px; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; font-weight: 600; font-family: var(--sans); }
-.qbox-again:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.qbox-enter { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); padding: 10px 20px; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; font-weight: 600; font-family: var(--sans); }
-.qbox-enter:hover { opacity: 0.88; }
-</style>
 </head>
 <body>
 
@@ -52,56 +35,5 @@
   <p class="hint">no account needed to look around</p>
 </main>
 
-
-<div class="qbox-mask" id="qbox-mask" hidden>
-  <div class="qbox" role="dialog" aria-modal="true" aria-labelledby="qbox-q">
-    <button class="qbox-close" id="qbox-close" aria-label="Close">&times;</button>
-    <p class="eyebrow">Doorbell question</p>
-    <p class="qbox-q" id="qbox-q"></p>
-    <p class="qbox-hint">Take a moment to think — or leave your answer in the
-      <a href="guestbook.html">guestbook</a>.</p>
-    <div class="qbox-actions">
-      <button type="button" class="qbox-again" id="qbox-again">Another question</button>
-      <a class="qbox-enter" href="home.html">Ring again · enter →</a>
-    </div>
-  </div>
-</div>
-
-<script src="js/config.js"></script>
-<script src="js/data.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  var bell = document.querySelector(".doorbell");
-  var mask = document.getElementById("qbox-mask");
-  var qEl = document.getElementById("qbox-q");
-
-  function pool() {
-    var data = loadData();
-    return (data && data.guestbook && Array.isArray(data.guestbook.shakePool) && data.guestbook.shakePool.length)
-      ? data.guestbook.shakePool
-      : ["What brings you here today?", "If you could ask the owner one thing, what would it be?"];
-  }
-  function pick() {
-    var p = pool();
-    qEl.textContent = p[Math.floor(Math.random() * p.length)];
-  }
-  function openBox() {
-    pick();
-    mask.hidden = false;
-    requestAnimationFrame(function () { mask.classList.add("open"); });
-    document.body.classList.add("no-scroll");
-  }
-  function closeBox() {
-    mask.classList.remove("open");
-    document.body.classList.remove("no-scroll");
-    setTimeout(function () { mask.hidden = true; }, 220);
-  }
-  if (bell) bell.addEventListener("click", function (e) { e.preventDefault(); openBox(); });
-  document.getElementById("qbox-again").addEventListener("click", pick);
-  document.getElementById("qbox-close").addEventListener("click", closeBox);
-  mask.addEventListener("click", function (e) { if (e.target === mask) closeBox(); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !mask.hidden) closeBox(); });
-});
-</script>
 </body>
 </html>
