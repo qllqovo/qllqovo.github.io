@@ -199,7 +199,7 @@ function setEditMode(on) {
 /* Persist all .editable fields (by data-path) into the store */
 function saveEdits() {
   const data = loadData();
-  document.querySelectorAll(".editable[data-path]").forEach(function (el) {
+  document.querySelectorAll(".editable[data-path], .img-edit[data-path]").forEach(function (el) {
     const path = el.getAttribute("data-path").split(".");
     let cur = data;
     for (let i = 0; i < path.length - 1; i++) cur = cur[path[i]];
