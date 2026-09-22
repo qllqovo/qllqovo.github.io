@@ -75,6 +75,17 @@ function compressImageFile(file, maxW, cb) {
 function bindImageUpload(container, onData) {
   const input = container.querySelector("input[type=file]");
   if (!input) return;
+  const btn = container.querySelector(".img-btn");
+  const openPicker = function () {
+    if (!document.body.classList.contains("edit-on")) return;
+    input.click();
+  };
+  if (btn) btn.addEventListener("click", openPicker);
+  /* clicking the photo area itself also opens the picker (editor mode) */
+  container.addEventListener("click", function (e) {
+    if (e.target.closest(".img-btn")) return;
+    openPicker();
+  });
   input.addEventListener("change", function () {
     if (input.files && input.files[0]) {
       compressImageFile(input.files[0], 900, function (dataUrl) {
@@ -82,6 +93,7 @@ function bindImageUpload(container, onData) {
         toast("Image updated — click Save to persist.");
       });
     }
+    input.value = "";
   });
 }
 
