@@ -142,6 +142,7 @@ function showLoginModal() {
       toast("Welcome back, qllqovo.");
       window.dispatchEvent(new CustomEvent("qlauth"));
       if (typeof setupEditMode === "function") setupEditMode();
+      maybePromptSyncKey();
     } else {
       errEl.textContent = "Wrong account or password.";
     }
@@ -155,6 +156,47 @@ function showLoginModal() {
   }, 60);
 }
 
+/* ---------- cloud sync pairing ---------- */
+function showSyncKeyModal() {
+  if (!gistConfigured()) {
+    toast("Cloud sync is not configured.");
+    return;
+  }
+  const body = openModal(
+    '<p class="eyebrow">Cloud sync</p>' +
+    "<h3>Link this device</h3>" +
+    '<p class="muted2 small" style="margin:10px 0 16px;">Paste your GitHub key to save edits to the cloud from this device. Create it with ONLY the "gist" scope (GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)). It is kept only in this browser — never on the site.</p>' +
+    '<div class="field"><label>Sync key (ghp_…)</label><input type="password" id="sync-token" autocomplete="off" placeholder="ghp_…"></div>' +
+    '<p id="sync-status" class="muted2 small" style="min-height:1.2em"></p>' +
+    '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Skip</button><button type="button" class="btn btn-sm" id="sync-save">Save key</button></div>'
+  );
+  const status = body.querySelector("#sync-status");
+  const inp = body.querySelector("#sync-token");
+  body.querySelector("#sync-save").addEventListener("click", function () {
+    const tok = inp.value.trim();
+    if (!tok) { status.textContent = "Paste the key first."; return; }
+    setSyncToken(tok);
+    status.textContent = "Checking with GitHub…";
+    pushRemoteData(loadData()).then(function (ok) {
+      if (ok) {
+        status.textContent = "";
+        closeModal();
+        toast("Cloud sync enabled on this device ✓");
+      } else {
+        setSyncToken("");
+        status.textContent = "Key rejected by GitHub — check it and try again.";
+      }
+    });
+  });
+  setTimeout(function () { if (inp) inp.focus(); }, 60);
+}
+
+function maybePromptSyncKey() {
+  if (!gistConfigured()) return;
+  if (getSyncToken()) return;
+  showSyncKeyModal();
+}
+
 /* ---------- edit mode ---------- */
 let EDIT_ON = false;
 function isEditMode() { return EDIT_ON; }
@@ -162,11 +204,15 @@ function isEditMode() { return EDIT_ON; }
 function setupEditMode() {
   const barHost = document.getElementById("edit-bar-slot");
   if (!barHost || !isLoggedIn()) return;
+  const syncBtn = gistConfigured() && !getSyncToken()
+    ? '<button id="edit-sync" type="button">Sync key</button>'
+    : "";
   barHost.innerHTML =
     '<div class="edit-bar" id="edit-bar">' +
       '<span class="eb-tag">Editor</span>' +
       '<button id="edit-toggle" type="button">Edit</button>' +
       '<button id="edit-save" type="button">Save</button>' +
+      syncBtn +
       '<button id="edit-exit" type="button">Exit</button>' +
     "</div>";
   document.getElementById("edit-toggle").addEventListener("click", function () {
@@ -176,6 +222,8 @@ function setupEditMode() {
   document.getElementById("edit-exit").addEventListener("click", function () {
     setEditMode(false);
   });
+  const syncB = document.getElementById("edit-sync");
+  if (syncB) syncB.addEventListener("click", showSyncKeyModal);
   if (typeof pageOnEditToggle === "function") {
     window.addEventListener("qledit", function () { pageOnEditToggle(EDIT_ON); });
   }

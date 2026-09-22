@@ -250,7 +250,7 @@ function saveData(data, silent) {
   pushRemoteData(data).then(function (pushed) {
     if (silent) return;
     if (pushed) toast("Saved & synced ✓");
-    else if (ok) toast("Saved (offline mode)");
+    else if (ok) toast(getSyncToken() ? "Saved locally — cloud push failed" : "Saved locally — no cloud key on this device");
   });
   return ok;
 }
@@ -258,6 +258,19 @@ function saveData(data, silent) {
 /* ---------- remote sync (GitHub Gist) ---------- */
 function gistConfigured() {
   return typeof QL_GIST_ID !== "undefined" && !!QL_GIST_ID;
+}
+
+const QL_SYNC_KEY = "qllqovo_sync_token";
+function getSyncToken() {
+  try { return localStorage.getItem(QL_SYNC_KEY) || ""; } catch (e) { return ""; }
+}
+function setSyncToken(token) {
+  token = String(token || "").trim();
+  try {
+    if (token) localStorage.setItem(QL_SYNC_KEY, token);
+    else localStorage.removeItem(QL_SYNC_KEY);
+    return true;
+  } catch (e) { return false; }
 }
 
 function fetchRemoteData(timeoutMs) {
@@ -283,13 +296,12 @@ function fetchRemoteData(timeoutMs) {
 
 function pushRemoteData(data) {
   return new Promise(function (resolve) {
-    if (!gistConfigured() || typeof QL_GIST_TOKEN === "undefined" || !QL_GIST_TOKEN) {
-      return resolve(false);
-    }
+    const token = getSyncToken();
+    if (!gistConfigured() || !token) return resolve(false);
     fetch("https://api.github.com/gists/" + QL_GIST_ID, {
       method: "PATCH",
       headers: {
-        "Authorization": "token " + QL_GIST_TOKEN,
+        "Authorization": "token " + token,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ files: (function () { const f = {}; f[QL_GIST_FILENAME] = { content: JSON.stringify(data, null, 1) }; return f; })() })
@@ -299,8 +311,50 @@ function pushRemoteData(data) {
   });
 }
 
+/* Union-by-id: keep items from B that are not in A (A wins for same id). */
+function unionById(a, b) {
+  const out = (a || []).slice();
+  const ids = new Set(out.map(function (x) { return x && x.id; }));
+  (b || []).forEach(function (x) {
+    if (x && !ids.has(x.id)) { out.push(x); ids.add(x.id); }
+  });
+  return out;
+}
+
+/* Merge cloud data with local data.
+   - Owner fields: cloud wins (it is authoritative).
+   - Guestbook entries and blog comments: union by id, so
+     comments left on THIS device are never wiped by a pull. */
+function unionMerge(remote, local) {
+  const out = cloneData(remote || {});
+  if (local && local.guestbook) {
+    if (!out.guestbook) out.guestbook = {};
+    out.guestbook.entries = unionById(
+      (out.guestbook && out.guestbook.entries) || [],
+      local.guestbook.entries || []
+    );
+  }
+  if (local && Array.isArray(local.blog) && Array.isArray(out.blog)) {
+    const localById = {};
+    local.blog.forEach(function (p) { if (p && p.id) localById[p.id] = p; });
+    const remoteIds = new Set(out.blog.map(function (p) { return p && p.id; }));
+    out.blog.forEach(function (p) {
+      if (!p) return;
+      const lp = localById[p.id];
+      if (lp && Array.isArray(lp.comments) && Array.isArray(p.comments)) {
+        p.comments = unionById(p.comments, lp.comments);
+      }
+    });
+    local.blog.forEach(function (p) {
+      if (p && p.id && !remoteIds.has(p.id)) out.blog.push(p);
+    });
+  }
+  return out;
+}
+
 /* Warm the local cache from the cloud once per page load.
-   If the cloud data differs, re-render the page. */
+   Merges rather than overwrites, so device-local comments and
+   guestbook entries survive. */
 let _remoteInited = false;
 function refreshFromRemote(renderFn) {
   if (_remoteInited) return;
@@ -313,10 +367,11 @@ function refreshFromRemote(renderFn) {
       const raw = localStorage.getItem(QL_DATA_KEY);
       local = raw ? JSON.parse(raw) : null;
     } catch (e) { local = null; }
-    const remoteJson = JSON.stringify(remote);
+    const merged = unionMerge(remote, local);
+    const mergedJson = JSON.stringify(merged);
     const localJson = local ? JSON.stringify(local) : null;
-    if (localJson !== remoteJson) {
-      try { localStorage.setItem(QL_DATA_KEY, remoteJson); } catch (e) {}
+    if (mergedJson !== localJson) {
+      try { localStorage.setItem(QL_DATA_KEY, mergedJson); } catch (e) {}
       if (typeof renderFn === "function") renderFn();
       toast("Synced with cloud.");
     }
