@@ -378,6 +378,28 @@ function refreshFromRemote(renderFn) {
   });
 }
 
+/* Re-pull the cloud on demand (e.g. the page becomes visible again), so
+   content published on another device shows up without a manual reload. */
+function reSyncFromRemote(renderFn) {
+  if (!gistConfigured()) return;
+  fetchRemoteData(4000).then(function (remote) {
+    if (!remote) return;
+    let local = null;
+    try {
+      const raw = localStorage.getItem(QL_DATA_KEY);
+      local = raw ? JSON.parse(raw) : null;
+    } catch (e) { local = null; }
+    const merged = unionMerge(remote, local);
+    const mergedJson = JSON.stringify(merged);
+    const localJson = local ? JSON.stringify(local) : null;
+    if (mergedJson !== localJson) {
+      try { localStorage.setItem(QL_DATA_KEY, mergedJson); } catch (e) {}
+      if (typeof renderFn === "function") renderFn();
+      toast("Synced with cloud.");
+    }
+  });
+}
+
 function deepMerge(base, over) {
   if (Array.isArray(base) && Array.isArray(over)) return over;
   if (over && typeof over === "object" && base && typeof base === "object") {

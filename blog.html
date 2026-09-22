@@ -561,6 +561,14 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   window.__pageRender = renderPosts;
+  /* re-pull from cloud when the tab becomes visible again (e.g. phone
+     unlocked), so posts published on other devices appear without reload */
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && typeof reSyncFromRemote === "function") {
+      reSyncFromRemote(window.__pageRender);
+    }
+  });
+
   initShell();
 });
 </script>
