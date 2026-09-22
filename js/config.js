@@ -28,6 +28,6 @@
    ============================================================ */
 "use strict";
 
-const QL_GIST_ID = "";            // gist id, e.g. "abc123..."
-const QL_GIST_TOKEN = "";         // classic PAT with ONLY the `gist` scope
+const QL_GIST_ID = "3071aff71a0a7d704f75517468d775b8";   // gist id
+const QL_GIST_TOKEN = "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";  // gist-scoped PAT
 const QL_GIST_FILENAME = "site-data.json";
