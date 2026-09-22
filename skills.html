@@ -217,6 +217,12 @@ function renderPerformances() {
     host.querySelectorAll(".reveal").forEach(function (el) { el.classList.add("in"); });
   }
   _perfFirstRender = false;
+  /* freshly rendered cards must respect the current edit mode (the qledit
+     listener only fires on toggle, not on re-render) */
+  const editingNow = isEditMode();
+  host.querySelectorAll("[data-pdel-row]").forEach(function (r) {
+    r.style.display = editingNow ? "flex" : "none";
+  });
 }
 function perfFormHtml() {
   return (
