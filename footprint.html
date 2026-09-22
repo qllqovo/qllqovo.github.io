@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Footprint — qllqovo</title>
+<meta name="description" content="Footprint of qllqovo — a world map of cities with notes.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.city-row { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; padding: 13px 0; border-bottom: var(--line); }
+.city-row:first-of-type { border-top: var(--line); }
+.city-row .c-name { font-weight: 600; }
+.city-row .c-country { font-size: 0.78rem; color: var(--ink-40); letter-spacing: 0.06em; }
+.city-row .c-status { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; padding: 3px 9px; border: 1px solid var(--ink); color: var(--ink); }
+.city-row .c-status.off { border-color: var(--ink-25); color: var(--ink-40); }
+.legend { display: flex; gap: 22px; flex-wrap: wrap; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-40); margin-top: 14px; }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 9px; height: 9px; display: inline-block; border: 1px solid var(--ink); background: var(--ink); }
+.legend i.off { background: transparent; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 08 — Footprint</p>
+      <h1 class="reveal">Cities I have <em class="italic">lit</em>.</h1>
+      <p class="lede reveal editable" data-path="footprint.note" style="color:var(--ink-60);"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="reveal">
+        <div class="map-frame" id="map-frame">
+          <div id="footprint-map" aria-label="World map of cities"></div>
+        </div>
+        <div class="legend">
+          <span><i></i> Lit — visited / lived</span>
+          <span><i class="off"></i> Unlit — planned</span>
+          <span id="map-hint">Click a lit city to read or leave a note</span>
+        </div>
+        <p class="small muted2 mt-2" id="map-edit-hint" style="display:none;">Editor mode: click anywhere on the map to add a city.</p>
+      </div>
+
+      <div class="section-head reveal" style="margin-top: 56px;">
+        <div>
+          <p class="eyebrow">Index of cities</p>
+          <h2>The list</h2>
+        </div>
+        <span class="idx" id="city-count">0 cities</span>
+      </div>
+      <div id="city-list" class="reveal"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Footprint</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var FP_MAP = null;
+var FP_MARKERS = {};
+
+function litIcon(lit) {
+  return L.divIcon({
+    className: "city-marker",
+    html: '<span class="city-dot' + (lit ? " lit" : "") + '" style="' + (lit ? "" : "background:transparent;") + '"></span>',
+    iconSize: [15, 15],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -8]
+  });
+}
+
+function renderCities() {
+  const data = loadData();
+  document.getElementById("city-count").textContent = data.footprint.cities.length + " cities";
+  document.querySelector('[data-path="footprint.note"]').textContent = data.footprint.note;
+
+  Object.keys(FP_MARKERS).forEach(function (id) { FP_MAP.removeLayer(FP_MARKERS[id]); });
+  FP_MARKERS = {};
+
+  data.footprint.cities.forEach(function (c) {
+    const m = L.marker([c.lat, c.lng], { icon: litIcon(c.lit), title: c.name }).addTo(FP_MAP);
+    m.bindPopup(buildPopup(c));
+    m.on("popupopen", function () { bindPopupHandlers(c.id); });
+    FP_MARKERS[c.id] = m;
+  });
+
+  const list = document.getElementById("city-list");
+  list.innerHTML = "";
+  if (!data.footprint.cities.length) {
+    list.innerHTML = emptyState("No cities yet", "The owner can light up cities after signing in — click the map in editor mode.");
+    return;
+  }
+  data.footprint.cities.forEach(function (c) {
+    const row = document.createElement("div");
+    row.className = "city-row reveal";
+    row.innerHTML =
+      '<div><div class="c-name">' + esc(c.name) + "</div><div class='c-country'>" + esc(c.country) + " · " + c.lat.toFixed(2) + ", " + c.lng.toFixed(2) + "</div></div>" +
+      '<span class="c-status' + (c.lit ? "" : " off") + '">' + (c.lit ? "Lit" : "Unlit") + "</span>" +
+      '<div class="flex gap-1" style="display:none;" data-cdel-row><button class="del-btn danger" data-cdel="' + c.id + '">Remove</button></div>';
+    list.appendChild(row);
+  });
+}
+
+function buildPopup(c) {
+  let comments = "";
+  if (c.comments && c.comments.length) {
+    comments = c.comments.map(function (cm) {
+      return '<div style="border-bottom:1px solid var(--ink-14); padding:7px 0;"><b style="font-size:0.8rem;">' + esc(cm.name || "Anonymous") + '</b> <span style="font-size:0.66rem;color:var(--ink-40);">' + esc(cm.time) + "</span><br><span style='font-size:0.85rem;'>" + esc(cm.text) + "</span></div>";
+    }).join("");
+  } else {
+    comments = '<p style="font-size:0.8rem;color:var(--ink-40);margin:4px 0;">No notes yet.</p>';
+  }
+  return (
+    '<div style="min-width:230px; max-width:300px;">' +
+      '<div style="font-family:var(--serif); font-size:1.15rem; margin-bottom:2px;">' + esc(c.name) + "</div>" +
+      '<div style="font-size:0.66rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-40); margin-bottom:10px;">' + esc(c.country) + "</div>" +
+      comments +
+      '<form class="fp-cmt" data-city="' + c.id + '" style="margin-top:10px;">' +
+        '<div style="display:flex; gap:6px; margin-bottom:6px;">' +
+          '<input type="text" placeholder="Name (optional)" style="flex:1; padding:7px 9px; border:1px solid var(--ink-25); background:var(--paper); font-size:0.78rem; outline:none;" maxlength="30">' +
+        "</div>" +
+        '<textarea placeholder="Leave a note for this city…" required style="width:100%; min-height:54px; padding:8px 9px; border:1px solid var(--ink-25); background:var(--paper); font-size:0.82rem; outline:none; resize:vertical;"></textarea>' +
+        '<div style="display:flex; gap:6px; margin-top:8px; align-items:center;">' +
+          '<button type="submit" style="padding:7px 14px; border:1px solid var(--ink); background:var(--ink); color:var(--bg); font-size:0.66rem; letter-spacing:0.12em; text-transform:uppercase; font-weight:600;">Leave note</button>' +
+          '<button type="button" data-toggle="' + c.id + '" style="padding:7px 14px; border:1px solid var(--ink-25); background:transparent; color:var(--ink); font-size:0.66rem; letter-spacing:0.12em; text-transform:uppercase; display:none;">' + (c.lit ? "Unlight" : "Light") + "</button>" +
+          '<button type="button" data-delcity="' + c.id + '" style="padding:7px 14px; border:1px solid var(--ink-25); background:transparent; color:var(--ink); font-size:0.66rem; letter-spacing:0.12em; text-transform:uppercase; display:none;">Remove</button>' +
+        "</div>" +
+      "</form>" +
+    "</div>"
+  );
+}
+
+function bindPopupHandlers(cityId) {
+  const pop = document.querySelector(".leaflet-popup .fp-cmt[data-city='" + cityId + "']");
+  if (!pop) return;
+  pop.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const data = loadData();
+    const c = data.footprint.cities.find(function (x) { return x.id === cityId; });
+    if (!c) return;
+    if (!c.comments) c.comments = [];
+    const name = pop.querySelector("input").value.trim() || "Anonymous";
+    const text = pop.querySelector("textarea").value.trim();
+    if (!text) return;
+    c.comments.push({ name: name, text: text, time: new Date().toISOString().slice(0, 10) });
+    saveData(data);
+    toast("Note delivered for " + c.name + ".");
+    FP_MARKERS[cityId].setPopupContent(buildPopup(c));
+    FP_MARKERS[cityId].openPopup();
+    bindPopupHandlers(cityId);
+  });
+  const tgl = pop.querySelector("[data-toggle]");
+  const del = pop.querySelector("[data-delcity]");
+  if (isEditMode()) {
+    tgl.style.display = "inline-block";
+    del.style.display = "inline-block";
+    tgl.addEventListener("click", function () {
+      const data = loadData();
+      const c = data.footprint.cities.find(function (x) { return x.id === cityId; });
+      if (c) { c.lit = !c.lit; saveData(data); renderCities(); toast(c.name + (c.lit ? " lit." : " unlit.")); }
+    });
+    del.addEventListener("click", function () {
+      const data = loadData();
+      data.footprint.cities = data.footprint.cities.filter(function (x) { return x.id !== cityId; });
+      saveData(data);
+      renderCities();
+      toast("City removed.");
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  if (typeof L === "undefined") {
+    document.getElementById("map-frame").innerHTML = '<div class="empty-state"><div class="e-title">Map failed to load</div><p>The map library could not be fetched. Please check your connection.</p></div>';
+    return;
+  }
+  FP_MAP = L.map("footprint-map", { scrollWheelZoom: true, worldCopyJump: true }).setView([24, 20], 2);
+  L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}", {
+    maxZoom: 12,
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ; &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(FP_MAP);
+
+  renderCities();
+
+  /* owner adds city by clicking the map (editor mode) */
+  FP_MAP.on("click", function (ev) {
+    if (!isEditMode()) return;
+    const body = openModal(
+      '<form id="city-form">' +
+        '<p class="eyebrow">New city</p><h3>Light up a city</h3>' +
+        '<div class="field"><label>City name</label><input type="text" id="cf-city" required placeholder="e.g. Paris"></div>' +
+        '<div class="field"><label>Country / region</label><input type="text" id="cf-country" placeholder="e.g. France"></div>' +
+        '<p class="small muted2" style="margin-bottom:16px;">Placed at ' + ev.latlng.lat.toFixed(3) + ", " + ev.latlng.lng.toFixed(3) + '</p>' +
+        '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add city</button></div>' +
+      "</form>"
+    );
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    body.querySelector("#city-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = loadData();
+      data.footprint.cities.push({
+        id: uid("c"),
+        name: body.querySelector("#cf-city").value.trim() || "Untitled city",
+        country: body.querySelector("#cf-country").value.trim() || "",
+        lat: ev.latlng.lat,
+        lng: ev.latlng.lng,
+        lit: true,
+        comments: []
+      });
+      saveData(data);
+      closeModal();
+      renderCities();
+      toast("City lit up.");
+    });
+  });
+
+  document.addEventListener("qledit", function () {
+    document.getElementById("map-edit-hint").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll("[data-cdel-row]").forEach(function (r) {
+      r.style.display = isEditMode() ? "flex" : "none";
+    });
+  });
+
+  document.getElementById("city-list").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-cdel]");
+    if (!btn) return;
+    const data = loadData();
+    data.footprint.cities = data.footprint.cities.filter(function (x) { return x.id !== btn.getAttribute("data-cdel"); });
+    saveData(data);
+    renderCities();
+    toast("City removed.");
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

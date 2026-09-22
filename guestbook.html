@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guestbook — qllqovo</title>
+<meta name="description" content="Guestbook of qllqovo — leave words, ask questions, shake for a question.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.type-pick { display: flex; gap: 10px; margin-bottom: 18px; }
+.type-pick button {
+  flex: 1; padding: 11px 10px;
+  border: 1px solid var(--ink-25);
+  background: transparent;
+  font-size: 0.74rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-60);
+  transition: all 0.25s var(--ease);
+}
+.type-pick button.on { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+.backstage { border: 1px dashed var(--ink-40); padding: 22px; margin-top: 44px; }
+.backstage h3 { font-size: 1.2rem; margin-bottom: 4px; }
+.backstage .bs-sub { font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-40); font-weight: 600; margin-bottom: 18px; }
+.bs-item { display: grid; grid-template-columns: 1fr auto; gap: 14px; padding: 14px 0; border-bottom: var(--line); align-items: start; }
+.bs-item:first-of-type { border-top: var(--line); }
+.bs-item .bs-type { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-40); margin-bottom: 4px; }
+.bs-item .bs-text { font-family: var(--serif); font-size: 1.02rem; }
+.bs-item .bs-who { font-size: 0.72rem; color: var(--ink-40); font-style: italic; margin-top: 4px; }
+.bs-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.bs-actions select, .bs-actions button {
+  background: var(--paper); border: 1px solid var(--ink-25);
+  font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 10px; color: var(--ink);
+}
+.bs-actions button:hover { border-color: var(--ink); background: var(--ink); color: var(--bg); }
+.gb-status-tag { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--ink-25); color: var(--ink-40); }
+.gb-status-tag.pub { border-color: var(--ink); color: var(--ink); }
+.gb-status-tag.priv { border-color: var(--ink-25); color: var(--ink-40); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 05 — Guestbook</p>
+      <h1 class="reveal">Leave your <em class="italic">words</em>,<br>or shake for a question.</h1>
+      <p class="lede reveal">Two doors: an open wall of words &amp; questions, and a
+        shake-shake box that hands you a random question to answer.</p>
+    </div>
+  </section>
+
+  <!-- ============ L module: leave your words/questions ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Leave your words / questions</p>
+          <h2>The wall</h2>
+        </div>
+        <button class="btn btn-sm" id="write-one-btn">Write one</button>
+      </div>
+
+      <div id="gb-grid" class="gb-grid reveal"></div>
+
+      <p class="eyebrow reveal" style="margin: 56px 0 16px;">Your submissions</p>
+      <div id="gb-mine" class="reveal"></div>
+
+      <div id="gb-backstage" class="backstage reveal" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- ============ S module: shake shake questions ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Shake shake questions</p>
+          <h2>The box of questions</h2>
+        </div>
+        <span class="idx">Give it a shake</span>
+      </div>
+
+      <div class="shake-stage reveal" id="shake-stage">
+        <div class="q" id="shake-q">Press the button to shake out a question.</div>
+        <button class="shake-btn" id="shake-btn" aria-label="Shake for a question" title="Shake!">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true">
+            <path d="M12 3.5c.9 0 1.5.6 1.5 1.5v1.6a6.3 6.3 0 0 1 4.9 6.2v2.1l1.6 3.3H4l1.6-3.3v-2.1a6.3 6.3 0 0 1 4.9-6.2V5c0-.9.6-1.5 1.5-1.5Z"/>
+            <path d="M10.2 18.6a1.8 1.8 0 0 0 3.6 0"/>
+          </svg>
+        </button>
+        <div class="shake-hint">click the bell, or press the spacebar</div>
+        <form id="shake-form" style="max-width: 560px; margin: 26px auto 0; display:none;">
+          <div class="field"><label>Your answer (optional)</label>
+            <textarea id="shake-answer" placeholder="Answer it here — it will be delivered to the owner." style="min-height:90px;"></textarea></div>
+          <button type="submit" class="btn btn-sm">Deliver answer</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Guestbook</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+var MINE_KEY = "qllqovo_mine_v1";
+var SHAKE_INDEX = Math.floor(Math.random() * 99999);
+
+function myIds() {
+  try { return JSON.parse(localStorage.getItem(MINE_KEY)) || []; }
+  catch (e) { return []; }
+}
+function addMyId(id) {
+  const ids = myIds();
+  if (ids.indexOf(id) < 0) { ids.push(id); localStorage.setItem(MINE_KEY, JSON.stringify(ids)); }
+}
+function isMine(id) { return myIds().indexOf(id) >= 0; }
+
+function renderGuestbook() {
+  const data = loadData();
+  const entries = data.guestbook.entries || [];
+
+  /* public grid */
+  const grid = document.getElementById("gb-grid");
+  const pub = entries.filter(function (e) { return e.ownerStatus === "public"; }).slice().reverse();
+  grid.innerHTML = "";
+  if (!pub.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;">' +
+      emptyState("The wall is quiet", "Be the first to leave a word or a question — press “Write one” above.") + "</div>";
+  }
+  pub.forEach(function (e) {
+    const who = e.identity === "public" && e.author ? esc(e.author) : "Anonymous";
+    const full = esc(e.text);
+    const brief = e.text.length > 150 ? full.slice(0, 150) + "…" : full;
+    const card = document.createElement("article");
+    card.className = "gb-card reveal";
+    card.innerHTML =
+      '<div class="gb-head"><span class="gb-type">' + esc(e.type === "question" ? "Question" : "Word") + '</span>' +
+      '<span class="gb-who">' + who + "</span></div>" +
+      '<div class="gb-text">' + brief + "</div>" +
+      (e.text.length > 150 ? '<div class="gb-full">' + full + "</div>" : "") +
+      (e.text.length > 150 ? '<div class="gb-expand"><span></span></div>' : "");
+    card.addEventListener("click", function () { card.classList.toggle("open"); });
+    grid.appendChild(card);
+  });
+
+  /* guest's own submissions (gray, bottom) */
+  const mine = entries.filter(function (e) { return isMine(e.id); }).slice().reverse();
+  const mineHost = document.getElementById("gb-mine");
+  mineHost.innerHTML = "";
+  if (mine.length) {
+    mine.forEach(function (e) {
+      const status = e.ownerStatus === "public"
+        ? '<span class="gb-status-tag pub">Public</span>'
+        : e.ownerStatus === "private"
+          ? '<span class="gb-status-tag priv">Private</span>'
+          : '<span class="gb-status-tag">Awaiting review</span>';
+      const card = document.createElement("article");
+      card.className = "gb-card gb-mine reveal";
+      card.innerHTML =
+        '<span class="gb-flag">Yours</span>' +
+        '<div class="gb-head"><span class="gb-type">' + esc(e.type === "question" ? "Question" : "Word") + "</span>" + status + "</div>" +
+        '<div class="gb-text">' + esc(e.text) + "</div>" +
+        '<div class="gb-who" style="margin-top:8px;">' + (e.identity === "public" && e.author ? esc(e.author) : "Anonymous") + " · " + esc(e.time) + "</div>";
+      mineHost.appendChild(card);
+    });
+  } else {
+    mineHost.innerHTML = emptyState("Nothing from you yet", "Submissions you make on this device will appear here, in gray, with their review status.");
+  }
+
+  /* backstage (owner) */
+  const back = document.getElementById("gb-backstage");
+  const on = isLoggedIn();
+  back.style.display = on ? "block" : "none";
+  if (on) renderBackstage();
+  applyEditState();
+}
+
+function renderBackstage() {
+  const data = loadData();
+  const entries = data.guestbook.entries || [];
+  const back = document.getElementById("gb-backstage");
+  if (!entries.length) {
+    back.innerHTML =
+      '<h3>Backstage</h3><div class="bs-sub">Inbox for guest submissions</div>' +
+      '<p class="muted2 small">No submissions yet.</p>';
+    return;
+  }
+  let html =
+    '<h3>Backstage</h3><div class="bs-sub">' + entries.length + " submissions — approve the public ones</div>";
+  entries.slice().reverse().forEach(function (e, ri) {
+    const realIdx = entries.length - 1 - ri;
+    html +=
+      '<div class="bs-item">' +
+        '<div><div class="bs-type">' + esc(e.type === "question" ? "Question" : "Word") + " · " + esc(e.time) + "</div>" +
+        '<div class="bs-text">' + esc(e.text) + "</div>" +
+        '<div class="bs-who">' + (e.identity === "public" && e.author ? esc(e.author) : "Anonymous") + "</div></div>" +
+        '<div class="bs-actions">' +
+          '<select data-status="' + e.id + '">' +
+            '<option value="pending"' + (e.ownerStatus === "pending" ? " selected" : "") + ">Pending</option>" +
+            '<option value="public"' + (e.ownerStatus === "public" ? " selected" : "") + ">Public</option>" +
+            '<option value="private"' + (e.ownerStatus === "private" ? " selected" : "") + ">Private</option>" +
+          "</select>" +
+          '<button data-bsdel="' + e.id + '">Delete</button>' +
+        "</div>" +
+      "</div>";
+  });
+  back.innerHTML = html;
+
+  back.querySelectorAll("[data-status]").forEach(function (sel) {
+    sel.addEventListener("change", function () {
+      const data = loadData();
+      const e = data.guestbook.entries.find(function (x) { return x.id === sel.getAttribute("data-status"); });
+      if (e) { e.ownerStatus = sel.value; saveData(data); renderGuestbook(); toast("Status updated — only “Public” shows on the wall."); }
+    });
+  });
+  back.querySelectorAll("[data-bsdel]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      const data = loadData();
+      data.guestbook.entries = data.guestbook.entries.filter(function (x) { return x.id !== b.getAttribute("data-bsdel"); });
+      saveData(data);
+      renderGuestbook();
+      toast("Entry removed.");
+    });
+  });
+}
+
+/* ---------- write one modal ---------- */
+function writeOneModal() {
+  return (
+    '<form id="write-form">' +
+      '<p class="eyebrow">Write one</p><h3>Leave a word or a question</h3>' +
+      '<div class="type-pick">' +
+        '<button type="button" class="on" data-type="word">Words</button>' +
+        '<button type="button" data-type="question">Questions</button>' +
+      "</div>" +
+      '<div class="field"><label>Content</label><textarea id="wf-text" required style="min-height:110px;" placeholder="Your words or question…"></textarea></div>' +
+      '<div class="field"><label>Display as</label><select id="wf-identity">' +
+        '<option value="anonymous">Anonymous</option>' +
+        '<option value="public">Public — show my name</option>' +
+      "</select></div>" +
+      '<div class="field" id="wf-name-wrap" style="display:none;"><label>Name</label><input type="text" id="wf-name" maxlength="30" placeholder="Your name"></div>' +
+      '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Deliver</button></div>' +
+    "</form>"
+  );
+}
+
+function submitEntry(type, text, identity, author) {
+  const data = loadData();
+  if (!data.guestbook.entries) data.guestbook.entries = [];
+  const entry = {
+    id: uid("gb"),
+    type: type,
+    text: text,
+    identity: identity,
+    author: author || "",
+    ownerStatus: "pending",
+    time: new Date().toISOString().slice(0, 10)
+  };
+  data.guestbook.entries.push(entry);
+  saveData(data);
+  addMyId(entry.id);
+  return entry;
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderGuestbook();
+
+  document.getElementById("write-one-btn").addEventListener("click", function () {
+    const body = openModal(writeOneModal());
+    let type = "word";
+    body.querySelectorAll(".type-pick button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        body.querySelectorAll(".type-pick button").forEach(function (x) { x.classList.remove("on"); });
+        b.classList.add("on");
+        type = b.getAttribute("data-type");
+      });
+    });
+    const ident = body.querySelector("#wf-identity");
+    ident.addEventListener("change", function () {
+      body.querySelector("#wf-name-wrap").style.display = ident.value === "public" ? "block" : "none";
+    });
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    body.querySelector("#write-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const text = body.querySelector("#wf-text").value.trim();
+      if (!text) return;
+      submitEntry(type, text, ident.value, body.querySelector("#wf-name").value.trim());
+      closeModal();
+      renderGuestbook();
+      toast("Delivered!✉");
+    });
+  });
+
+  /* ---------- shake shake ---------- */
+  const stage = document.getElementById("shake-stage");
+  const qEl = document.getElementById("shake-q");
+  const shakeForm = document.getElementById("shake-form");
+
+  function shake() {
+    const data = loadData();
+    const pool = (data.guestbook.shakePool && data.guestbook.shakePool.length)
+      ? data.guestbook.shakePool
+      : ["If your life were a book, which chapter are you in right now?"];
+    stage.classList.remove("shaking");
+    void stage.offsetWidth;
+    stage.classList.add("shaking");
+    SHAKE_INDEX = (SHAKE_INDEX + 1) % pool.length;
+    setTimeout(function () {
+      qEl.textContent = pool[SHAKE_INDEX];
+      shakeForm.style.display = "block";
+    }, 260);
+  }
+
+  document.getElementById("shake-btn").addEventListener("click", shake);
+  document.addEventListener("keydown", function (e) {
+    if (e.code === "Space" && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {
+      e.preventDefault();
+      shake();
+    }
+  });
+
+  shakeForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    const answer = document.getElementById("shake-answer").value.trim();
+    submitEntry("question", answer || qEl.textContent, "anonymous", "");
+    document.getElementById("shake-answer").value = "";
+    shakeForm.style.display = "none";
+    renderGuestbook();
+    toast("Delivered!✉");
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

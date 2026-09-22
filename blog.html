@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — qllqovo</title>
+<meta name="description" content="Blog by qllqovo — notes and stories, with comments open.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.article-overlay {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  z-index: 120;
+  overflow-y: auto;
+  display: none;
+}
+.article-overlay.open { display: block; }
+.article-overlay .ao-bar {
+  position: sticky; top: 0;
+  background: rgba(249,248,246,0.94);
+  backdrop-filter: blur(8px);
+  border-bottom: var(--line);
+  z-index: 5;
+}
+.article-overlay .ao-inner { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+.article-overlay .ao-close {
+  background: none; border: 1px solid var(--ink);
+  padding: 9px 20px;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+  transition: all 0.25s var(--ease);
+}
+.article-overlay .ao-close:hover { background: var(--ink); color: var(--bg); }
+.ao-body p { color: var(--ink-80); margin-bottom: 18px; font-size: 1.02rem; line-height: 1.9; }
+.comment { border-bottom: var(--line); padding: 16px 0; }
+.comment .c-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.comment .c-name { font-weight: 600; font-size: 0.88rem; }
+.comment .c-time { font-size: 0.68rem; color: var(--ink-40); letter-spacing: 0.08em; }
+.comment .c-text { color: var(--ink-60); font-size: 0.93rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 03 — Blog</p>
+      <h1 class="reveal">Notes, stories &amp;<br><em class="italic">marginalia</em>.</h1>
+      <p class="lede reveal">Longer thoughts from projects and life. Every post keeps
+        its comment box open — leave a line or two below.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Latest writing</p>
+          <h2>The journal</h2>
+        </div>
+        <span class="idx" id="post-count">0 posts</span>
+      </div>
+      <div id="post-list"></div>
+      <div id="post-add-slot" style="display:none;">
+        <button class="add-btn" id="post-add-btn">+ Write a post</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Blog</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<!-- article overlay -->
+<div class="article-overlay" id="article-overlay">
+  <div class="ao-bar">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding-top:14px; padding-bottom:14px;">
+      <span class="brand" style="font-size:1.1rem;">qllqovo<span class="dot">.</span> blog</span>
+      <button class="ao-close" id="ao-close">Close</button>
+    </div>
+  </div>
+  <div class="ao-inner" id="ao-content"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+var CURRENT_POST = null;
+
+function renderPosts() {
+  const data = loadData();
+  const host = document.getElementById("post-list");
+  host.innerHTML = "";
+  document.getElementById("post-count").textContent = data.blog.length + (data.blog.length === 1 ? " post" : " posts");
+
+  if (!data.blog.length) {
+    host.innerHTML = emptyState("The journal is empty", "The owner will write here after signing in. Come back later.");
+    return;
+  }
+
+  data.blog.slice().reverse().forEach(function (post) {
+    const row = document.createElement("article");
+    row.className = "reveal";
+    const excerpt = post.excerpt || (post.content && post.content[0] ? post.content[0] : "");
+    row.innerHTML =
+      '<div class="post-item" role="button" tabindex="0" data-open="' + post.id + '">' +
+        '<div class="meta">' + esc(post.category || "Note") + " · " + esc(post.date) + "</div>" +
+        '<h3>' + esc(post.title) + "</h3>" +
+        "<p>" + esc(excerpt) + "</p>" +
+        '<span class="more">Read &amp; comment</span>' +
+      "</div>" +
+      '<div class="flex" style="justify-content:flex-end; margin:-8px 0 22px; display:none;" data-del-row>' +
+        '<button class="del-btn danger" data-del="' + post.id + '">Delete post</button>' +
+      "</div>";
+    host.appendChild(row);
+  });
+
+  host.querySelectorAll("[data-open]").forEach(function (el) {
+    el.addEventListener("click", function () { openPost(el.getAttribute("data-open")); });
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openPost(el.getAttribute("data-open")); }
+    });
+  });
+}
+
+function openPost(id) {
+  const data = loadData();
+  const idx = data.blog.findIndex(function (p) { return p.id === id; });
+  if (idx < 0) return;
+  CURRENT_POST = idx;
+  renderArticle();
+  document.getElementById("article-overlay").classList.add("open");
+  document.body.classList.add("no-scroll");
+  document.getElementById("article-overlay").scrollTop = 0;
+}
+
+function closeArticle() {
+  document.getElementById("article-overlay").classList.remove("open");
+  document.body.classList.remove("no-scroll");
+}
+
+function renderArticle() {
+  const data = loadData();
+  const post = data.blog[CURRENT_POST];
+  const host = document.getElementById("ao-content");
+  if (!post) return;
+
+  let imageHtml = "";
+  if (post.image) {
+    imageHtml =
+      '<div class="img-edit" data-path="blog.' + CURRENT_POST + '.image" data-field="image" style="margin-bottom:26px; width:100%;">' +
+        '<img src="' + post.image + '" alt="' + esc(post.title) + '" style="width:100%; border:var(--line);">' +
+        '<button type="button" class="img-btn">Change image</button>' +
+        '<input type="file" accept="image/*" style="display:none;">' +
+      "</div>";
+  }
+
+  let paras = "";
+  post.content.forEach(function (p, i) {
+    paras += '<p class="editable" data-path="blog.' + CURRENT_POST + '.content.' + i + '">' + esc(p) + "</p>";
+  });
+
+  let comments = "";
+  if (post.comments && post.comments.length) {
+    comments = '<div class="flex between items-center" style="margin:34px 0 14px;"><h3 style="font-size:1.4rem;">Comments (' + post.comments.length + ")</h3></div>";
+    post.comments.forEach(function (c, ci) {
+      comments +=
+        '<div class="comment">' +
+          '<div class="c-head"><span class="c-name">' + esc(c.name || "Anonymous") + '</span><span class="c-time">' + esc(c.time) + "</span></div>" +
+          '<p class="c-text">' + esc(c.text) + "</p>" +
+          '<div style="display:none; margin-top:6px;" data-cdel-row><button class="del-btn danger" data-cdel="' + ci + '">Delete</button></div>' +
+        "</div>";
+    });
+  } else {
+    comments = '<p class="muted2" style="margin:30px 0 12px; font-size:0.9rem;">No comments yet — be the first to leave one.</p>';
+  }
+
+  host.innerHTML =
+    '<p class="eyebrow" style="margin-bottom:14px;">' + esc(post.category || "Note") + " · " + esc(post.date) + "</p>" +
+    "<h1 style='font-size:clamp(1.9rem,4.4vw,3rem); margin-bottom:26px;'>" + esc(post.title) + "</h1>" +
+    imageHtml +
+    paras +
+    '<div style="border-top:var(--line); margin-top:40px;">' + comments +
+      '<form id="comment-form" class="mt-3" style="max-width:560px;">' +
+        '<p class="eyebrow" style="margin-bottom:16px;">Leave a comment</p>' +
+        '<div class="field"><label>Name (optional)</label><input type="text" id="cm-name" maxlength="30" placeholder="Anonymous"></div>' +
+        '<div class="field"><label>Comment</label><textarea id="cm-text" required style="min-height:90px;"></textarea></div>' +
+        '<button type="submit" class="btn btn-sm">Post comment</button>' +
+      "</form>" +
+    "</div>";
+
+  bindImageUpload(host.querySelector(".img-edit"), function (dataUrl) {
+    const data = loadData();
+    data.blog[CURRENT_POST].image = dataUrl;
+    saveData(data);
+    renderArticle();
+  });
+
+  host.querySelector("#comment-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const data = loadData();
+    const name = host.querySelector("#cm-name").value.trim() || "Anonymous";
+    const text = host.querySelector("#cm-text").value.trim();
+    if (!text) return;
+    if (!data.blog[CURRENT_POST].comments) data.blog[CURRENT_POST].comments = [];
+    data.blog[CURRENT_POST].comments.push({ name: name, text: text, time: new Date().toISOString().slice(0, 10) });
+    saveData(data);
+    toast("Comment posted. Thank you!");
+    renderArticle();
+  });
+  applyEditState();
+
+  host.querySelectorAll("[data-cdel]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      const ci = Number(b.getAttribute("data-cdel"));
+      const data = loadData();
+      data.blog[CURRENT_POST].comments.splice(ci, 1);
+      saveData(data);
+      renderArticle();
+      toast("Comment removed.");
+    });
+  });
+
+  host.querySelectorAll("[data-cdel-row]").forEach(function (r) {
+    r.style.display = isEditMode() ? "block" : "none";
+  });
+}
+
+function postForm() {
+  return (
+    '<form id="post-form">' +
+      '<p class="eyebrow">New entry</p><h3>Write a post</h3>' +
+      '<div class="field"><label>Title</label><input type="text" id="bp-title" required></div>' +
+      '<div class="field"><label>Category</label><input type="text" id="bp-cat" placeholder="Note / Project / Life"></div>' +
+      '<div class="field"><label>Excerpt</label><input type="text" id="bp-excerpt"></div>' +
+      '<div class="field"><label>Content (paragraphs separated by blank lines)</label><textarea id="bp-content" style="min-height:200px;"></textarea></div>' +
+      '<div class="field"><label>Cover image</label><input type="file" id="bp-image" accept="image/*"><span class="small muted2" style="display:block; margin-top:4px;">Optional — will be compressed and stored.</span></div>' +
+      '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Publish post</button></div>' +
+    "</form>"
+  );
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderPosts();
+  document.getElementById("ao-close").addEventListener("click", closeArticle);
+
+  document.addEventListener("qledit", function () {
+    document.getElementById("post-add-slot").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll("[data-del-row]").forEach(function (r) {
+      r.style.display = isEditMode() ? "flex" : "none";
+    });
+    if (document.getElementById("article-overlay").classList.contains("open")) renderArticle();
+  });
+
+  document.getElementById("post-list").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-del]");
+    if (!btn) return;
+    const data = loadData();
+    data.blog = data.blog.filter(function (p) { return p.id !== btn.getAttribute("data-del"); });
+    saveData(data);
+    renderPosts();
+    toast("Post deleted.");
+  });
+
+  document.getElementById("post-add-btn").addEventListener("click", function () {
+    const body = openModal(postForm());
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    let cover = "";
+    const imgInput = body.querySelector("#bp-image");
+    imgInput.addEventListener("change", function () {
+      if (imgInput.files && imgInput.files[0]) {
+        compressImageFile(imgInput.files[0], 1000, function (d) { cover = d; toast("Cover image ready — publish to save."); });
+      }
+    });
+    body.querySelector("#post-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = loadData();
+      const now = new Date();
+      data.blog.push({
+        id: uid("post"),
+        title: body.querySelector("#bp-title").value.trim() || "Untitled",
+        category: body.querySelector("#bp-cat").value.trim() || "Note",
+        excerpt: body.querySelector("#bp-excerpt").value.trim(),
+        date: now.getFullYear() + "." + String(now.getMonth() + 1).padStart(2, "0") + "." + String(now.getDate()).padStart(2, "0"),
+        content: body.querySelector("#bp-content").value.split(/\n\s*\n/).map(function (s) { return s.trim(); }).filter(Boolean),
+        image: cover,
+        comments: []
+      });
+      saveData(data);
+      closeModal();
+      renderPosts();
+      toast("Post published.");
+    });
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

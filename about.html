@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Me — qllqovo</title>
+<meta name="description" content="About qllqovo — Liao Yuxuan, electrical engineering student at Jiangnan University.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.intro-grid { display:grid; gap:44px; grid-template-columns: 220px 1fr; align-items:start; }
+@media (max-width: 700px) { .intro-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 01 — About Me</p>
+      <h1 class="reveal"><span class="editable" data-path="about.headline"></span></h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow" style="margin-bottom: 22px;">The short version</p>
+        <div class="intro-grid">
+          <div class="img-edit" data-path="about.portrait" data-field="image" style="border:var(--line); background:var(--paper); aspect-ratio:3/4; width:100%; max-width:220px; position:relative;">
+            <div id="portrait-mono" style="width:100%; height:100%; min-height:290px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; font-family:var(--serif); color:var(--ink-40); text-align:center;">
+              <span style="font-size:2.6rem; letter-spacing:0.08em;" id="portrait-letters">LYX</span>
+              <span style="font-size:0.62rem; letter-spacing:0.3em; text-transform:uppercase;" id="portrait-name">qllqovo</span>
+            </div>
+            <img id="portrait-img" alt="Portrait" style="display:none; width:100%; object-fit:cover;">
+            <button type="button" class="img-btn">Change photo</button>
+            <input type="file" accept="image/*" style="display:none;">
+          </div>
+          <div id="about-intro"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Facts</p>
+          <h2>At a glance</h2>
+        </div>
+        <span class="idx">02</span>
+      </div>
+      <ul class="rows reveal" id="about-facts"></ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Education &amp; experience</p>
+          <h2>The path so far</h2>
+        </div>
+        <span class="idx">03</span>
+      </div>
+      <p class="eyebrow reveal" style="margin-bottom: 14px;">Education</p>
+      <ul class="timeline reveal" id="about-edu"></ul>
+      <p class="eyebrow reveal" style="margin: 34px 0 14px;">Experience</p>
+      <ul class="timeline reveal" id="about-exp"></ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-2" style="gap: 48px;">
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom: 18px;">Awards</p>
+          <ul class="rows" id="about-awards"></ul>
+        </div>
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom: 18px;">Languages</p>
+          <ul class="rows" id="about-langs"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>About Me</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const data = loadData();
+  const a = data.about;
+
+  document.querySelector('[data-path="about.headline"]').textContent = a.headline;
+
+  const introHost = document.getElementById("about-intro");
+  a.intro.forEach(function (p, i) {
+    const el = document.createElement("p");
+    el.className = "editable";
+    el.setAttribute("data-path", "about.intro." + i);
+    el.textContent = p;
+    el.style.marginBottom = "14px";
+    el.style.color = "var(--ink-80)";
+    introHost.appendChild(el);
+  });
+
+  const factsHost = document.getElementById("about-facts");
+  a.facts.forEach(function (f, i) {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="k">' + esc(f.k) + '</span><span class="v editable" data-path="about.facts.' + i + '.v">' + esc(f.v) + "</span>";
+    factsHost.appendChild(li);
+  });
+
+  function timeline(host, list, pathPrefix) {
+    list.forEach(function (it, i) {
+      const li = document.createElement("li");
+      li.innerHTML =
+        '<div class="tl-time">' + esc(it.time) + "</div>" +
+        '<div class="tl-axis"><span class="tl-dot"></span></div>' +
+        '<div class="tl-body">' +
+          '<h4 class="editable" data-path="' + pathPrefix + "." + i + '.org">' + esc(it.org) + "</h4>" +
+          '<div class="sub editable" data-path="' + pathPrefix + "." + i + '.role">' + esc(it.role) + "</div>" +
+          '<p class="editable" data-path="' + pathPrefix + "." + i + '.desc">' + esc(it.desc) + "</p>" +
+        "</div>";
+      host.appendChild(li);
+    });
+  }
+  timeline(document.getElementById("about-edu"), a.education, "about.education");
+  timeline(document.getElementById("about-exp"), a.experience, "about.experience");
+
+  const awHost = document.getElementById("about-awards");
+  a.awards.forEach(function (aw, i) {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="k">' + esc(aw.time) + '</span><span class="v editable" data-path="about.awards.' + i + '.name">' + esc(aw.name) + "</span>";
+    awHost.appendChild(li);
+  });
+
+  const lgHost = document.getElementById("about-langs");
+  a.languages.forEach(function (l, i) {
+    const li = document.createElement("li");
+    li.innerHTML = '<span class="k">' + esc(l.name) + '</span><span class="v editable" data-path="about.languages.' + i + '.level">' + esc(l.level) + "</span>";
+    lgHost.appendChild(li);
+  });
+
+  /* portrait: show uploaded photo if any, else keep the monogram */
+  const portraitBox = document.querySelector('[data-path="about.portrait"]');
+  if (a.portrait) {
+    document.getElementById("portrait-mono").style.display = "none";
+    const img = document.getElementById("portrait-img");
+    img.src = a.portrait;
+    img.style.display = "block";
+  }
+  bindImageUpload(portraitBox, function (dataUrl) {
+    document.getElementById("portrait-mono").style.display = "none";
+    const img = document.getElementById("portrait-img");
+    img.src = dataUrl;
+    img.style.display = "block";
+    toast("Photo ready — click Save to persist.");
+  });
+
+  applyEditState();
+  initShell();
+});
+</script>
+</body>
+</html>

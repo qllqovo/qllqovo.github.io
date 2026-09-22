@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — qllqovo</title>
+<meta name="description" content="Contact qllqovo — email, phone and location.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 04 — Contact</p>
+      <h1 class="reveal">Say <em class="italic">hello</em>.</h1>
+      <p class="lede reveal editable" data-path="contact.note" style="color:var(--ink-60);"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="grid" style="grid-template-columns: 1fr; gap: 56px;">
+        <div class="reveal">
+          <p class="eyebrow" style="margin-bottom: 18px;">Direct lines</p>
+          <ul class="rows" id="contact-rows"></ul>
+        </div>
+
+        <div class="reveal" style="max-width: 640px;">
+          <p class="eyebrow" style="margin-bottom: 18px;">Or write a note</p>
+          <form id="contact-form">
+            <div class="field"><label>Your name</label><input type="text" id="cf-name" maxlength="40" placeholder="How should I call you?"></div>
+            <div class="field"><label>Your email</label><input type="email" id="cf-email" placeholder="you@example.com"></div>
+            <div class="field"><label>Message</label><textarea id="cf-msg" required placeholder="Your message…"></textarea></div>
+            <button type="submit" class="btn">Send message</button>
+          </form>
+          <p class="small muted2 mt-2">Sends via your own mail app — no server involved.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Contact</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const data = loadData();
+  document.querySelector('[data-path="contact.note"]').textContent = data.contact.note;
+
+  const host = document.getElementById("contact-rows");
+  data.contact.items.forEach(function (it, i) {
+    const li = document.createElement("li");
+    const link = it.link
+      ? '<a class="u editable" data-path="contact.items.' + i + '.v" href="' + esc(it.link) + '">' + esc(it.v) + "</a>"
+      : '<span class="v editable" data-path="contact.items.' + i + '.v">' + esc(it.v) + "</span>";
+    li.innerHTML = '<span class="k">' + esc(it.k) + "</span>" + link;
+    host.appendChild(li);
+  });
+
+  document.getElementById("contact-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const name = document.getElementById("cf-name").value.trim();
+    const email = document.getElementById("cf-email").value.trim();
+    const msg = document.getElementById("cf-msg").value.trim();
+    if (!msg) return;
+    const subject = encodeURIComponent("Hello from " + (name || "a visitor") + " — qllqovo website");
+    const body = encodeURIComponent(msg + "\n\n— " + (name || "Anonymous") + (email ? " (" + email + ")" : ""));
+    window.location.href = "mailto:" + data.contact.items[0].v + "?subject=" + subject + "&body=" + body;
+    toast("Opening your mail app…");
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

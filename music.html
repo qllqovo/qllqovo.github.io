@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Music Playlist — qllqovo</title>
+<meta name="description" content="Music playlist of qllqovo — tracks on repeat.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.nowplaying {
+  display: flex; align-items: center; gap: 24px;
+  border: var(--line); background: var(--paper);
+  padding: 26px;
+  margin-bottom: 44px;
+}
+.np-disc {
+  width: 76px; height: 76px; flex: 0 0 76px;
+  border-radius: 50%;
+  border: 1px solid var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-style: italic; font-size: 0.8rem;
+  color: var(--ink-60); background: var(--bg);
+}
+.np-info .np-label { font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-40); font-weight: 600; margin-bottom: 6px; }
+.np-info .np-title { font-family: var(--serif); font-size: 1.4rem; }
+.np-info .np-artist { color: var(--ink-60); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 07 — Music Playlist</p>
+      <h1 class="reveal">On <em class="italic">repeat</em>.</h1>
+      <p class="lede reveal editable" data-path="music.note" style="color:var(--ink-60);"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="reveal">
+        <div class="nowplaying">
+          <div class="np-disc" id="np-disc">…</div>
+          <div class="np-info">
+            <div class="np-label">Now spinning</div>
+            <div class="np-title" id="np-title">Nothing yet</div>
+            <div class="np-artist" id="np-artist">Add tracks to start the rotation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Playlist</p>
+          <h2>The rotation</h2>
+        </div>
+        <span class="idx" id="track-count">0 tracks</span>
+      </div>
+
+      <div id="track-list"></div>
+      <div id="track-add-slot" style="display:none;">
+        <button class="add-btn" id="track-add-btn">+ Add a track</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Music Playlist</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function renderMusic() {
+  const data = loadData();
+  const host = document.getElementById("track-list");
+  host.innerHTML = "";
+  document.getElementById("track-count").textContent = data.music.playlist.length + " tracks";
+  document.querySelector('[data-path="music.note"]').textContent = data.music.note;
+
+  if (!data.music.playlist.length) {
+    host.innerHTML = emptyState("The rotation is empty", "Signed-in owner can add tracks — title, artist and an optional link.");
+    return;
+  }
+
+  data.music.playlist.forEach(function (t, i) {
+    const row = document.createElement("div");
+    row.className = "track reveal";
+    const linkHtml = t.link
+      ? '<a class="trk-link u" href="' + esc(t.link) + '" target="_blank" rel="noopener">Listen ↗</a>'
+      : '<span class="trk-link">—</span>';
+    row.innerHTML =
+      '<span class="trk-no">' + String(i + 1).padStart(2, "0") + "</span>" +
+      '<div><div class="trk-t editable" data-path="music.playlist.' + i + '.title">' + esc(t.title) + "</div>" +
+      '<div class="trk-a editable" data-path="music.playlist.' + i + '.artist">' + esc(t.artist) + "</div></div>" +
+      '<div class="flex items-center gap-2">' + linkHtml +
+        '<span class="trk-actions"><button class="del-btn danger" data-tdel="' + t.id + '">Delete</button></span>' +
+      "</div>";
+    host.appendChild(row);
+  });
+
+  const first = data.music.playlist[0];
+  document.getElementById("np-title").textContent = first ? first.title : "Nothing yet";
+  document.getElementById("np-artist").textContent = first ? first.artist : "Add tracks to start the rotation";
+  document.getElementById("np-disc").textContent = first ? first.title.slice(0, 2).toUpperCase() : "…";
+  applyEditState();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderMusic();
+
+  document.addEventListener("qledit", function () {
+    document.getElementById("track-add-slot").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll(".trk-actions").forEach(function (r) {
+      r.style.display = isEditMode() ? "inline-flex" : "none";
+    });
+  });
+
+  document.getElementById("track-list").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-tdel]");
+    if (!btn) return;
+    const data = loadData();
+    data.music.playlist = data.music.playlist.filter(function (t) { return t.id !== btn.getAttribute("data-tdel"); });
+    saveData(data);
+    renderMusic();
+    toast("Track removed.");
+  });
+
+  document.getElementById("track-add-btn").addEventListener("click", function () {
+    const body = openModal(
+      '<form id="track-form">' +
+        '<p class="eyebrow">New track</p><h3>Add a track</h3>' +
+        '<div class="field"><label>Title</label><input type="text" id="tf-title" required></div>' +
+        '<div class="field"><label>Artist</label><input type="text" id="tf-artist" required></div>' +
+        '<div class="field"><label>Link (optional)</label><input type="url" id="tf-link" placeholder="https://…"></div>' +
+        '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add track</button></div>' +
+      "</form>"
+    );
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    body.querySelector("#track-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = loadData();
+      data.music.playlist.push({
+        id: uid("t"),
+        title: body.querySelector("#tf-title").value.trim() || "Untitled",
+        artist: body.querySelector("#tf-artist").value.trim() || "Unknown artist",
+        link: body.querySelector("#tf-link").value.trim()
+      });
+      saveData(data);
+      closeModal();
+      renderMusic();
+      toast("Track added.");
+    });
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects — qllqovo</title>
+<meta name="description" content="Projects by qllqovo — energy platforms, event galas, sponsorship and debate tournaments.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 02 — Projects</p>
+      <h1 class="reveal">Things I have <em class="italic">built</em><br>and delivered.</h1>
+      <p class="lede reveal">From dual-carbon platforms to hundred-person galas —
+        a record of the work I have owned end to end.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Selected work</p>
+          <h2>The record</h2>
+        </div>
+        <span class="idx">05 entries</span>
+      </div>
+      <div id="project-list"></div>
+      <div id="project-add-slot" style="display:none;">
+        <button class="add-btn" id="project-add-btn">+ Add a project</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="skills.html">Skills</a></li>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Projects</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function renderProjects() {
+  const data = loadData();
+  const host = document.getElementById("project-list");
+  host.innerHTML = "";
+  data.projects.forEach(function (p, i) {
+    const card = document.createElement("article");
+    card.className = "reveal";
+    card.style.cssText = "border-bottom:var(--line); padding:34px 4px;";
+    if (i === 0) card.style.borderTop = "var(--line)";
+
+    let highlights = "";
+    p.highlights.forEach(function (h, hi) {
+      highlights +=
+        '<li style="margin-bottom:8px; color:var(--ink-60); font-size:0.95rem;">' +
+        '<span class="editable" data-path="projects.' + i + '.highlights.' + hi + '">' + esc(h) + "</span></li>";
+    });
+
+    let tags = "";
+    p.tags.forEach(function (t) { tags += '<span class="tag">' + esc(t) + "</span>"; });
+
+    card.innerHTML =
+      '<div class="flex between wrap gap-2" style="margin-bottom:12px;">' +
+        '<span class="num serif italic" style="color:var(--ink-40);">' + String(i + 1).padStart(2, "0") + "</span>" +
+        '<span class="muted2 small" style="letter-spacing:0.12em; text-transform:uppercase;">' + esc(p.period) + "</span>" +
+      "</div>" +
+      '<h3 class="editable" data-path="projects.' + i + '.title" style="font-size:clamp(1.4rem,2.8vw,1.9rem); margin-bottom:6px;">' + esc(p.title) + "</h3>" +
+      '<p class="muted2 small" style="margin-bottom:16px; font-weight:600; letter-spacing:0.04em;">' + esc(p.role) + "</p>" +
+      '<p class="editable" data-path="projects.' + i + '.description" style="color:var(--ink-80); max-width:52em; margin-bottom:16px;">' + esc(p.description) + "</p>" +
+      '<ul style="list-style:none; max-width:52em; margin-bottom:14px;">' + highlights + "</ul>" +
+      '<div class="flex wrap items-center between" style="gap:12px;">' +
+        '<div>' + tags + "</div>" +
+        '<div class="flex gap-1" style="display:none;" data-del-row>' +
+          '<button class="del-btn danger" data-del="' + p.id + '">Delete</button>' +
+        "</div>" +
+      "</div>";
+
+    host.appendChild(card);
+  });
+
+  if (!data.projects.length) {
+    host.innerHTML = emptyState("No projects yet", "The owner can add projects after signing in.");
+  }
+  applyEditState();
+}
+
+function projectForm() {
+  return (
+    '<form id="proj-form">' +
+      '<p class="eyebrow">New project</p><h3>Add a project</h3>' +
+      '<div class="field"><label>Title</label><input type="text" id="pf-title" required></div>' +
+      '<div class="field"><label>Role</label><input type="text" id="pf-role"></div>' +
+      '<div class="field"><label>Period</label><input type="text" id="pf-period" placeholder="2026.07 – 2026.08"></div>' +
+      '<div class="field"><label>Description</label><textarea id="pf-desc"></textarea></div>' +
+      '<div class="field"><label>Highlights (one per line)</label><textarea id="pf-highlights" style="min-height:110px;"></textarea></div>' +
+      '<div class="field"><label>Tags (comma separated)</label><input type="text" id="pf-tags"></div>' +
+      '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add project</button></div>' +
+    "</form>"
+  );
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderProjects();
+
+  document.addEventListener("qledit", function () {
+    const data = loadData();
+    const delRows = document.querySelectorAll("[data-del-row]");
+    delRows.forEach(function (r) { r.style.display = isEditMode() ? "flex" : "none"; });
+    document.getElementById("project-add-slot").style.display = isEditMode() ? "block" : "none";
+  });
+
+  document.getElementById("project-list").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-del]");
+    if (!btn) return;
+    const id = btn.getAttribute("data-del");
+    const data = loadData();
+    data.projects = data.projects.filter(function (p) { return p.id !== id; });
+    saveData(data);
+    renderProjects();
+    toast("Project deleted.");
+  });
+
+  document.getElementById("project-add-btn").addEventListener("click", function () {
+    const body = openModal(projectForm());
+    body.querySelectorAll("[data-close]").forEach(function (b) {
+      b.addEventListener("click", closeModal);
+    });
+    body.querySelector("#proj-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = loadData();
+      data.projects.unshift({
+        id: uid("p"),
+        title: body.querySelector("#pf-title").value.trim() || "Untitled project",
+        role: body.querySelector("#pf-role").value.trim(),
+        period: body.querySelector("#pf-period").value.trim(),
+        description: body.querySelector("#pf-desc").value.trim(),
+        highlights: body.querySelector("#pf-highlights").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean),
+        tags: body.querySelector("#pf-tags").value.split(",").map(function (s) { return s.trim(); }).filter(Boolean)
+      });
+      saveData(data);
+      closeModal();
+      renderProjects();
+      toast("Project added.");
+    });
+  });
+
+  initShell();
+});
+</script>
+</body>
+</html>

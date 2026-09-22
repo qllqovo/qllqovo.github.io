@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills — qllqovo</title>
+<meta name="description" content="Skills of qllqovo — engineering, product design, testing and communication.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23F9F8F6'/%3E%3Ctext x='12' y='17' font-family='Georgia,serif' font-size='14' fill='%231C1C1C' text-anchor='middle'%3Eq%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Karla:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="home.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="projects.html">Projects</a>
+      <a href="blog.html">Blog</a>
+      <a href="guestbook.html">Guestbook</a>
+      <a href="contact.html">Contact</a>
+      <span id="auth-slot"></span>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow reveal">Chapter 06 — Skills</p>
+      <h1 class="reveal">What I can <em class="italic">do</em>.</h1>
+      <p class="lede reveal">A honest self-report — levels are my own judgement,
+        updated as I keep learning.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Competence map</p>
+          <h2>Skill sets</h2>
+        </div>
+        <span class="idx">5 groups</span>
+      </div>
+      <div id="skill-groups"></div>
+      <div id="skill-add-slot" style="display:none;">
+        <button class="add-btn" id="skill-add-btn">+ Add a skill</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="f-grid">
+      <div>
+        <div class="f-brand">qllqovo<span style="color:var(--ink-40)">.</span></div>
+        <p class="f-tag">Back to the index of eight rooms.</p>
+      </div>
+      <div class="f-col">
+        <h4>Rooms</h4>
+        <ul>
+          <li><a href="home.html">Home</a></li>
+          <li><a href="about.html">About Me</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="blog.html">Blog</a></li>
+        </ul>
+      </div>
+      <div class="f-col">
+        <h4>More</h4>
+        <ul>
+          <li><a href="music.html">Music Playlist</a></li>
+          <li><a href="footprint.html">Footprint</a></li>
+          <li><a href="guestbook.html">Guestbook</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 qllqovo</span><span>Skills</span></div>
+  </div>
+</footer>
+
+<div id="edit-bar-slot"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function renderSkills() {
+  const data = loadData();
+  const host = document.getElementById("skill-groups");
+  host.innerHTML = "";
+
+  data.skills.forEach(function (g, gi) {
+    const group = document.createElement("div");
+    group.className = "skill-group reveal";
+    let rows = "";
+    g.items.forEach(function (it, ii) {
+      rows +=
+        '<div class="skill-row" data-g="' + gi + '" data-i="' + ii + '">' +
+          '<div class="sk-name"><span class="editable" data-path="skills.' + gi + '.items.' + ii + '.name">' + esc(it.name) + "</span>" +
+            '<span class="sk-lv">' + it.level + " / 100</span></div>" +
+          '<div class="sk-track"><div class="sk-fill" style="width:' + Math.min(100, it.level) + '%"></div></div>' +
+          '<div class="flex gap-1 mt-1" style="display:none;" data-sdel-row>' +
+            '<button class="del-btn danger" data-sdel="' + gi + ':' + ii + '">Delete</button>' +
+          "</div>" +
+        "</div>";
+    });
+    group.innerHTML =
+      '<h3>' + esc(g.category) + "</h3>" +
+      '<div class="sg-sub">' + esc(g.sub) + "</div>" + rows;
+    host.appendChild(group);
+  });
+
+  if (!data.skills.length) {
+    host.innerHTML = emptyState("No skills listed", "The owner can add skills after signing in.");
+  }
+  applyEditState();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  renderSkills();
+
+  document.addEventListener("qledit", function () {
+    document.getElementById("skill-add-slot").style.display = isEditMode() ? "block" : "none";
+    document.querySelectorAll("[data-sdel-row]").forEach(function (r) {
+      r.style.display = isEditMode() ? "flex" : "none";
+    });
+  });
+
+  document.getElementById("skill-groups").addEventListener("click", function (e) {
+    const btn = e.target.closest("[data-sdel]");
+    if (!btn) return;
+    const parts = btn.getAttribute("data-sdel").split(":");
+    const data = loadData();
+    data.skills[Number(parts[0])].items.splice(Number(parts[1]), 1);
+    saveData(data);
+    renderSkills();
+    toast("Skill removed.");
+  });
+
+  document.getElementById("skill-add-btn").addEventListener("click", function () {
+    const body = openModal(
+      '<form id="skill-form">' +
+        '<p class="eyebrow">New skill</p><h3>Add a skill</h3>' +
+        '<div class="field"><label>Name</label><input type="text" id="sf-name" required></div>' +
+        '<div class="field"><label>Group</label><select id="sf-group">' +
+          dataGroupOptions() +
+          '<option value="__new__">— New group…</option></select></div>' +
+        '<div class="field" id="sf-newgroup-wrap" style="display:none;"><label>New group name</label><input type="text" id="sf-newgroup"></div>' +
+        '<div class="field"><label>Level (0–100)</label><input type="number" id="sf-level" min="0" max="100" value="70"></div>' +
+        '<div class="modal-foot"><button type="button" class="btn btn-ghost btn-sm" data-close="1">Cancel</button><button type="submit" class="btn btn-sm">Add skill</button></div>' +
+      "</form>"
+    );
+    body.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeModal); });
+    const sel = body.querySelector("#sf-group");
+    sel.addEventListener("change", function () {
+      body.querySelector("#sf-newgroup-wrap").style.display = sel.value === "__new__" ? "block" : "none";
+    });
+    body.querySelector("#skill-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = loadData();
+      const name = body.querySelector("#sf-name").value.trim();
+      const level = Math.max(0, Math.min(100, Number(body.querySelector("#sf-level").value) || 0));
+      let gi = Number(sel.value);
+      if (sel.value === "__new__") {
+        const ng = body.querySelector("#sf-newgroup").value.trim() || "New group";
+        data.skills.push({ category: ng, sub: "Custom", items: [] });
+        gi = data.skills.length - 1;
+      }
+      data.skills[gi].items.push({ name: name, level: level });
+      saveData(data);
+      closeModal();
+      renderSkills();
+      toast("Skill added.");
+    });
+  });
+
+  function dataGroupOptions() {
+    const data = loadData();
+    return data.skills.map(function (g, i) { return '<option value="' + i + '">' + esc(g.category) + "</option>"; }).join("");
+  }
+
+  initShell();
+});
+</script>
+</body>
+</html>
