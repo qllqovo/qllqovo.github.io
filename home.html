@@ -15,6 +15,9 @@
 <header class="masthead">
   <div class="masthead-inner">
     <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <nav class="nav-links" aria-label="Main">
       <a href="home.html">Home</a>
       <a href="about.html">About</a>
@@ -129,12 +132,17 @@
 
 <div id="edit-bar-slot"></div>
 
+<script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+function renderHome() {
   const data = loadData();
   document.getElementById("footer-tagline").textContent = data.meta.tagline;
+}
+window.__pageRender = renderHome;
+document.addEventListener("DOMContentLoaded", function () {
+  renderHome();
   initShell();
 });
 </script>

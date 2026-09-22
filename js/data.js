@@ -218,28 +218,109 @@ const DEFAULT_DATA = {
 };
 
 /* ---------- storage helpers ---------- */
+function cloneData(o) {
+  return typeof structuredClone === "function"
+    ? structuredClone(o)
+    : JSON.parse(JSON.stringify(o));
+}
+
 function loadData() {
   try {
     const raw = localStorage.getItem(QL_DATA_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      return deepMerge(structuredClone(DEFAULT_DATA), parsed);
+      return deepMerge(cloneData(DEFAULT_DATA), parsed);
     }
   } catch (e) {
     console.warn("Failed to load stored data, using defaults.", e);
   }
-  return structuredClone(DEFAULT_DATA);
+  return cloneData(DEFAULT_DATA);
 }
 
-function saveData(data) {
+function saveData(data, silent) {
+  let ok = false;
   try {
     localStorage.setItem(QL_DATA_KEY, JSON.stringify(data));
-    return true;
+    ok = true;
   } catch (e) {
     console.error("Failed to save data (storage may be full).", e);
     toast("Storage is full — image may be too large.");
     return false;
   }
+  pushRemoteData(data).then(function (pushed) {
+    if (silent) return;
+    if (pushed) toast("Saved & synced ✓");
+    else if (ok) toast("Saved (offline mode)");
+  });
+  return ok;
+}
+
+/* ---------- remote sync (GitHub Gist) ---------- */
+function gistConfigured() {
+  return typeof QL_GIST_ID !== "undefined" && !!QL_GIST_ID;
+}
+
+function fetchRemoteData(timeoutMs) {
+  return new Promise(function (resolve) {
+    if (!gistConfigured()) return resolve(null);
+    const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    const t = setTimeout(function () { if (ctrl) ctrl.abort(); }, timeoutMs || 5000);
+    fetch("https://api.github.com/gists/" + QL_GIST_ID, { signal: ctrl ? ctrl.signal : undefined })
+      .then(function (r) {
+        if (!r.ok) throw new Error("gist read " + r.status);
+        return r.json();
+      })
+      .then(function (g) {
+        clearTimeout(t);
+        const file = g && g.files && g.files[QL_GIST_FILENAME];
+        if (!file) return resolve(null);
+        try { resolve(JSON.parse(file.content)); }
+        catch (e) { resolve(null); }
+      })
+      .catch(function () { clearTimeout(t); resolve(null); });
+  });
+}
+
+function pushRemoteData(data) {
+  return new Promise(function (resolve) {
+    if (!gistConfigured() || typeof QL_GIST_TOKEN === "undefined" || !QL_GIST_TOKEN) {
+      return resolve(false);
+    }
+    fetch("https://api.github.com/gists/" + QL_GIST_ID, {
+      method: "PATCH",
+      headers: {
+        "Authorization": "token " + QL_GIST_TOKEN,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ files: (function () { const f = {}; f[QL_GIST_FILENAME] = { content: JSON.stringify(data, null, 1) }; return f; })() })
+    })
+      .then(function (r) { resolve(r.ok); })
+      .catch(function () { resolve(false); });
+  });
+}
+
+/* Warm the local cache from the cloud once per page load.
+   If the cloud data differs, re-render the page. */
+let _remoteInited = false;
+function refreshFromRemote(renderFn) {
+  if (_remoteInited) return;
+  _remoteInited = true;
+  if (!gistConfigured()) return;
+  fetchRemoteData(4000).then(function (remote) {
+    if (!remote) return;
+    let local = null;
+    try {
+      const raw = localStorage.getItem(QL_DATA_KEY);
+      local = raw ? JSON.parse(raw) : null;
+    } catch (e) { local = null; }
+    const remoteJson = JSON.stringify(remote);
+    const localJson = local ? JSON.stringify(local) : null;
+    if (localJson !== remoteJson) {
+      try { localStorage.setItem(QL_DATA_KEY, remoteJson); } catch (e) {}
+      if (typeof renderFn === "function") renderFn();
+      toast("Synced with cloud.");
+    }
+  });
 }
 
 function deepMerge(base, over) {

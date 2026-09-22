@@ -15,6 +15,9 @@
 <header class="masthead">
   <div class="masthead-inner">
     <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <nav class="nav-links" aria-label="Main">
       <a href="home.html">Home</a>
       <a href="about.html">About</a>
@@ -91,14 +94,16 @@
 
 <div id="edit-bar-slot"></div>
 
+<script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+function renderContact() {
   const data = loadData();
   document.querySelector('[data-path="contact.note"]').textContent = data.contact.note;
 
   const host = document.getElementById("contact-rows");
+  host.innerHTML = "";
   data.contact.items.forEach(function (it, i) {
     const li = document.createElement("li");
     const link = it.link
@@ -107,7 +112,13 @@ document.addEventListener("DOMContentLoaded", function () {
     li.innerHTML = '<span class="k">' + esc(it.k) + "</span>" + link;
     host.appendChild(li);
   });
+  applyEditState();
+}
+window.__pageRender = renderContact;
+document.addEventListener("DOMContentLoaded", function () {
+  renderContact();
 
+  const data = loadData();
   document.getElementById("contact-form").addEventListener("submit", function (e) {
     e.preventDefault();
     const name = document.getElementById("cf-name").value.trim();

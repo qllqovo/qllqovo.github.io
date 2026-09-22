@@ -28,6 +28,9 @@
 <header class="masthead">
   <div class="masthead-inner">
     <a class="brand" href="home.html">qllqovo<span class="dot">.</span></a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
     <nav class="nav-links" aria-label="Main">
       <a href="home.html">Home</a>
       <a href="about.html">About</a>
@@ -107,6 +110,7 @@
 
 <div id="edit-bar-slot"></div>
 
+<script src="js/config.js"></script>
 <script src="js/data.js"></script>
 <script src="js/app.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -286,7 +290,8 @@ document.addEventListener("DOMContentLoaded", function () {
     toast("City removed.");
   });
 
-  initShell();
+  window.__pageRender = renderCities;
+initShell();
 });
 </script>
 </body>

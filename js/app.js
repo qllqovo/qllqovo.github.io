@@ -211,8 +211,7 @@ function saveEdits() {
       cur[key] = el.innerText.trim();
     }
   });
-  if (saveData(data)) toast("Saved.");
-  else toast("Save failed.");
+  if (saveData(data)) { /* saveData shows status toast (synced / offline) */ }
 }
 
 /* ---------- reveal on scroll ---------- */
@@ -241,10 +240,34 @@ function initShell() {
   renderAuthPill();
   setupEditMode();
   initReveal();
+  initNavToggle();
   const current = location.pathname.split("/").pop() || "index.html";
   document.querySelectorAll(".nav-links a").forEach(function (a) {
     const href = a.getAttribute("href");
     if (href === current) a.classList.add("active");
+  });
+  /* cloud sync: warm cache and re-render if remote data differs */
+  if (typeof refreshFromRemote === "function") {
+    refreshFromRemote(window.__pageRender);
+  }
+}
+
+/* mobile hamburger menu */
+function initNavToggle() {
+  const btn = document.getElementById("nav-toggle");
+  const links = document.querySelector(".nav-links");
+  if (!btn || !links) return;
+  btn.addEventListener("click", function () {
+    const open = links.classList.toggle("open");
+    btn.classList.toggle("open", open);
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  links.addEventListener("click", function (e) {
+    if (e.target.tagName === "A" || e.target.closest("#auth-slot")) {
+      links.classList.remove("open");
+      btn.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
   });
 }
 
