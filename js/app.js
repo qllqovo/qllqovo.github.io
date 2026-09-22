@@ -241,6 +241,9 @@ function setEditMode(on) {
   applyEditState();
   const toggle = document.getElementById("edit-toggle");
   if (toggle) toggle.textContent = on ? "Editing…" : "Edit";
+  /* broadcast on both document and window: pages listen on document,
+     the shell pageOnEditToggle hook listens on window */
+  document.dispatchEvent(new CustomEvent("qledit"));
   window.dispatchEvent(new CustomEvent("qledit"));
 }
 
